@@ -63,7 +63,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         } else {
              hasContinuous = false;
              effectiveMaxMarks = 50;
-             if (subject.subjectName === "শারীরিক ও মানসিক স্বাস্থ্য") {
+             if (["শারীরিক ও মানসিক স্বাস্থ্য", "স্বাস্থ্য শিক্ষা"].includes(subject.subjectName)) {
                 effectiveMaxMarks = 25;
              }
              if (terminalMarks < (effectiveMaxMarks * 0.4)) { // 40% pass mark
