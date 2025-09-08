@@ -121,7 +121,6 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
         <CardHeader className="text-center p-4 print:p-2 border-b-2 border-gray-200 relative">
             <div className="flex justify-center items-center mb-4">
-                <img src="https://i.ibb.co/9g7v3G1/logo.png" alt="School Logo" className="h-16 w-16 mr-4" />
                 <div>
                     <h1 className="text-3xl font-bold text-blue-800">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
                     <p className="text-base text-gray-700">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
