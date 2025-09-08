@@ -52,7 +52,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     let hasContinuous = false;
     let subjectHasFailed = false;
 
-    if (isClass1Or2) {
+    if (isClass1Or2) { // Class 1-2 Logic
         if (["বাংলা", "গনিত", "ইংরেজি"].includes(subject.subjectName)) {
             hasContinuous = true;
             totalMarks += continuousMarks;
@@ -62,18 +62,16 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             }
         } else {
              hasContinuous = false;
-             effectiveMaxMarks = 50;
-             if (["শারীরিক ও মানসিক স্বাস্থ্য", "স্বাস্থ্য শিক্ষা"].includes(subject.subjectName)) {
-                effectiveMaxMarks = 25;
-             }
-             if (subject.subjectName === "সংগীত") {
+             if (subject.subjectName === "ইসলাম ও নৈতিক শিক্ষা" || subject.subjectName === "পরিবেশ পরিচিতি (সমন্বিত)" || subject.subjectName === "সংগীত") {
                 effectiveMaxMarks = 50;
+             } else if (subject.subjectName === "স্বাস্থ্য শিক্ষা" || subject.subjectName === "চারু ও কারুকলা") {
+                effectiveMaxMarks = 25;
              }
              if (terminalMarks < (effectiveMaxMarks * 0.4)) { // 40% pass mark
                 subjectHasFailed = true;
             }
         }
-    } else { // Class 3-5
+    } else { // Class 3-5 Logic
         const isSpecial = specialSubjects_c3_5.includes(subject.subjectName) || (student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"].includes(subject.subjectName));
         hasContinuous = !isSpecial;
         
@@ -103,7 +101,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     totalMaxMarks += effectiveMaxMarks;
     
     const isGradedForGpa = isClass1Or2 
-        ? true
+        ? ["বাংলা", "গনিত", "ইংরেজি"].includes(subject.subjectName)
         : !specialSubjects_c3_5.includes(subject.subjectName) && !(student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"].includes(subject.subjectName));
 
     if (isGradedForGpa) {
@@ -217,7 +215,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                         {subjectsWithGrades.map((subject) => (
                           <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
                             <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
-                            <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
+                            <TableCell className="text-center px-3 py-2">{subject.hasContinuous ? toBengaliNumber(subject.terminal) : toBengaliNumber(subject.terminal)}</TableCell>
                             <TableCell className="text-center px-3 py-2">
                                 {subject.hasContinuous ? toBengaliNumber(subject.continuous) : '-'}
                             </TableCell>
@@ -246,7 +244,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                     {subjectsWithGrades.map((subject) => (
                       <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
                         <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
-                        <TableCell className="text-center px-3 py-2">{subject.hasContinuous || subject.maxMarks === 100 ? toBengaliNumber(subject.terminal) : '-'}</TableCell>
+                        <TableCell className="text-center px-3 py-2">{subject.hasContinuous || subject.maxMarks === 100 ? toBengaliNumber(subject.terminal) : toBengaliNumber(subject.totalMarks)}</TableCell>
                          <TableCell className="text-center px-3 py-2">
                             {subject.hasContinuous ? toBengaliNumber(subject.continuous) : '-'}
                         </TableCell>
