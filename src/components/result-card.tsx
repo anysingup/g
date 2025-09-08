@@ -48,9 +48,9 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     const continuousMarks = isSpecial ? 0 : subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
     
-    const effectiveMaxMarks = (student.class === 5 && isSpecial) ? 50 : 100;
-    const maxContinuous = (student.class === 5 && isSpecial) ? 0 : 30;
-    const maxTerminal = (student.class === 5 && isSpecial) ? 50 : 70;
+    const effectiveMaxMarks = (student.class >= 4 && isSpecial) ? 50 : 100;
+    const maxContinuous = (student.class >= 4 && isSpecial) ? 0 : 30;
+    const maxTerminal = (student.class >= 4 && isSpecial) ? 50 : 70;
 
 
     const { grade, gpa } = getGradeInfo(totalMarks, effectiveMaxMarks);
@@ -109,10 +109,11 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
-        <CardHeader className="text-center p-4 print:p-2 border-b-2 border-black mb-4">
+        <CardHeader className="text-center p-4 print:p-2 border-b-2 border-black relative">
             <h1 className="text-3xl font-bold text-blue-800">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
             <p className="text-base text-gray-700 font-semibold">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
             <p className="text-base text-gray-700 font-semibold">EMIS: 91411050804</p>
+            <div className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-black"></div>
             <div className="mt-2">
                 <h2 className="text-2xl font-bold text-green-700 inline-block px-4 py-1 border-2 border-green-700 rounded-lg">একাডেমিক ট্রান্সক্রিপ্ট</h2>
                 <p className="text-lg text-gray-800 font-bold mt-2">{getTerminalExamName(result.examType)} - {toBengaliNumber(currentYear)}</p>
