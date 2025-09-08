@@ -77,7 +77,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         
         if(hasContinuous) {
             totalMarks += continuousMarks;
-            if (terminalMarks < 28 || continuousMarks < 10) { // Assuming 70 for terminal, 30 for continuous
+            if (terminalMarks < 28 || continuousMarks < 12) { // 40% of 70, 40% of 30
                 subjectHasFailed = true;
             }
         } else {
@@ -147,7 +147,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   const currentYear = new Date().getFullYear();
 
   const getClassTeacherName = (sClass: number) => {
-      if (sClass < 3) return "শাকিলা বেগম";
+      if (sClass === 1 || sClass === 2) return "শাকিলা বেগম";
+      if (sClass === 4) return "শাহানা আকতার খানম";
       return "ফরিদা ইয়াছমীন";
   }
 

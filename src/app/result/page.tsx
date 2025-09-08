@@ -38,11 +38,18 @@ function ResultDisplay() {
     }
     
     const sClass = parseInt(studentClass);
+    const sRoll = parseInt(rollNumber);
+
+    if (sClass === 4 && sRoll === 16) {
+        setError("এই শিক্ষার্থীর কোনো তথ্য পাওয়া যায়নি কারণ সে অন্যত্র ভর্তি হয়েছে।");
+        setLoading(false);
+        return;
+    }
 
     const student = students.find(
       (s) =>
         s.class === sClass &&
-        s.roll === parseInt(rollNumber) &&
+        s.roll === sRoll &&
         academicYear === "2025"
     );
 
