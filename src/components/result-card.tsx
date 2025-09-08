@@ -34,6 +34,12 @@ export function ResultCard({ student, result }: ResultCardProps) {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: `${student.name}-Result`,
+    trigger: () => (
+        <Button className="print:hidden">
+          <Printer className="mr-2 h-4 w-4" />
+          প্রিন্ট করুন
+        </Button>
+    )
   });
 
   let totalGpa = 0;
@@ -141,15 +147,13 @@ export function ResultCard({ student, result }: ResultCardProps) {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center bg-muted/50 p-4 rounded-b-lg gap-4 text-center sm:text-left print:bg-transparent">
-             <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 font-semibold">
-                <div className="flex items-center gap-2">
-                    ফলাফল:{" "}
-                    <Badge variant={hasFailed ? "destructive" : "default"}>
-                    {finalResult}
-                    </Badge>
-                </div>
-                {!hasFailed && <p>গড় জিপিএ: {averageGpa.toFixed(2)}</p>}
+             <div className="flex items-center gap-2 font-semibold">
+                ফলাফল:{" "}
+                <Badge variant={hasFailed ? "destructive" : "default"}>
+                {finalResult}
+                </Badge>
             </div>
+            {!hasFailed && <p className="font-semibold">গড় জিপিএ: {averageGpa.toFixed(2)}</p>}
             <p className="text-xs text-muted-foreground print:hidden">
               Harinkhaine Result Portal
             </p>
@@ -199,10 +203,7 @@ export function ResultCard({ student, result }: ResultCardProps) {
       </div>
 
       <div className="w-full max-w-4xl mx-auto text-center mt-4">
-        <Button onClick={handlePrint} className="print:hidden">
-          <Printer className="mr-2 h-4 w-4" />
-          প্রিন্ট করুন
-        </Button>
+        {handlePrint}
       </div>
     </>
   );
