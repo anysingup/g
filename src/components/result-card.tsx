@@ -74,16 +74,17 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             }
         }
     } else { // Class 3-5
-        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName) || (student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা"].includes(subject.subjectName));
+        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName) || (student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"].includes(subject.subjectName));
         hasContinuous = !isSpecial;
-        effectiveMaxMarks = isSpecial ? 50 : 100;
         
         if(hasContinuous) {
             totalMarks += continuousMarks;
-            if (terminalMarks < 28 || continuousMarks < 12) { // 40% of 70, 40% of 30
+            effectiveMaxMarks = 100;
+            if (terminalMarks < 28 || continuousMarks < 10) { 
                 subjectHasFailed = true;
             }
         } else {
+             effectiveMaxMarks = 50;
              if (terminalMarks < 17) { // 33% of 50
                 subjectHasFailed = true;
             }
@@ -245,7 +246,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                     {subjectsWithGrades.map((subject) => (
                       <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
                         <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
-                        <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
+                        <TableCell className="text-center px-3 py-2">{subject.hasContinuous || subject.maxMarks === 100 ? toBengaliNumber(subject.terminal) : '-'}</TableCell>
                          <TableCell className="text-center px-3 py-2">
                             {subject.hasContinuous ? toBengaliNumber(subject.continuous) : '-'}
                         </TableCell>
