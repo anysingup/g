@@ -14,5 +14,7 @@ export interface Student {
   class: number;
   roll: number;
   name: string;
+  fatherName: string;
+  motherName: string;
   results: ExamResult[];
 }

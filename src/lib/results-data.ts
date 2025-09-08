@@ -6,9 +6,9 @@ export const allSubjects = [
   "ইংরেজি",
   "বাংলাদেশ ও বিশ্বপরিচয়",
   "প্রাথমিক বিজ্ঞান",
-  "ইসলাম ধর্ম",
-  "শারিরিক শিক্ষা",
-  "চারুকারু",
+  "ইসলাম ও নৈতিক শিক্ষা",
+  "শারীরিক শিক্ষা",
+  "চারু ও কারুকলা",
   "সংগীত",
 ];
 
@@ -18,6 +18,8 @@ export const students: Student[] = [
     class: 1,
     roll: 1,
     name: "আরিফ হোসেন",
+    fatherName: "Unknown",
+    motherName: "Unknown",
     results: [
       {
         examType: "প্রথম প্রান্তিক",
@@ -30,10 +32,36 @@ export const students: Student[] = [
     ],
   },
   {
+    id: "c5r1",
+    class: 5,
+    roll: 1,
+    name: "আতিফা রহমান আলভী",
+    fatherName: "মোহাম্মদ সেকান্দর রহমান",
+    motherName: "আয়েশা ফেরদৌস",
+    results: [
+      {
+        examType: "দ্বিতীয় প্রান্তিক",
+        subjects: [
+          { subjectName: "বাংলা", terminal: 68, continuous: 30 },
+          { subjectName: "গনিত", terminal: 69, continuous: 30 },
+          { subjectName: "ইংরেজি", terminal: 70, continuous: 30 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 69, continuous: 30 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 30 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 69, continuous: 30 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
+          { subjectName: "চারু ও কারুকলা", terminal: 50, continuous: 0 },
+          { subjectName: "সংগীত", terminal: 50, continuous: 0 },
+        ]
+      }
+    ]
+  },
+  {
     id: "c5r10",
     class: 5,
     roll: 10,
     name: "সুমাইয়া আক্তার",
+    fatherName: "Unknown",
+    motherName: "Unknown",
     results: [
       {
         examType: "বার্ষিক",
@@ -43,10 +71,10 @@ export const students: Student[] = [
           { subjectName: "ইংরেজি", terminal: 62, continuous: 25 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 58, continuous: 27 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 66, continuous: 29 },
-          { subjectName: "ইসলাম ধর্ম", terminal: 70, continuous: 30 },
-          { subjectName: "শারিরিক শিক্ষা", terminal: 40, continuous: 24 },
-          { subjectName: "চারুকারু", terminal: 30, continuous: 26 },
-          { subjectName: "সংগীত", terminal: 29, continuous: 23 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 70, continuous: 30 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
+          { subjectName: "চারু ও কারুকলা", terminal: 30, continuous: 0 },
+          { subjectName: "সংগীত", terminal: 29, continuous: 0 },
         ],
       },
       {
@@ -57,7 +85,7 @@ export const students: Student[] = [
           { subjectName: "ইংরেজি", terminal: 52, continuous: 22 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 48, continuous: 23 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 56, continuous: 29 },
-          { subjectName: "ইসলাম ধর্ম", terminal: 60, continuous: 30 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 60, continuous: 30 },
         ],
       },
        {
@@ -68,7 +96,7 @@ export const students: Student[] = [
           { subjectName: "ইংরেজি", terminal: 42, continuous: 20 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 38, continuous: 21 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 46, continuous: 25 },
-          { subjectName: "ইসলাম ধর্ম", terminal: 50, continuous: 28 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 50, continuous: 28 },
         ],
       },
     ],
@@ -78,6 +106,8 @@ export const students: Student[] = [
     class: 3,
     roll: 5,
     name: "মোঃ রাকিব",
+    fatherName: "Unknown",
+    motherName: "Unknown",
     results: [
        {
         examType: "বার্ষিক",
@@ -87,7 +117,7 @@ export const students: Student[] = [
           { subjectName: "ইংরেজি", terminal: 12, continuous: 20 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 28, continuous: 21 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 36, continuous: 25 },
-          { subjectName: "ইসলাম ধর্ম", terminal: 40, continuous: 28 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 40, continuous: 28 },
         ],
       },
     ]
