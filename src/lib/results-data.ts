@@ -7,6 +7,7 @@ export const allSubjects = [
   "বাংলাদেশ ও বিশ্বপরিচয়",
   "প্রাথমিক বিজ্ঞান",
   "ইসলাম ও নৈতিক শিক্ষা",
+  "সমাজ বিজ্ঞান (সমন্বিত)",
   "শারীরিক শিক্ষা",
   "চারুকলা",
   "কারুকলা",
@@ -18,10 +19,23 @@ export const students: Student[] = [
     id: "c1r1",
     class: 1,
     roll: 1,
-    name: "আরিফ হোসেন",
-    fatherName: "Unknown",
-    motherName: "Unknown",
+    name: "আলআমিন",
+    fatherName: "কামরান হোসেন",
+    motherName: "শারমিন আকতার",
     results: [
+      {
+        examType: "দ্বিতীয় প্রান্তিক",
+        subjects: [
+          { subjectName: "বাংলা", terminal: 50, continuous: 50 },
+          { subjectName: "গনিত", terminal: 50, continuous: 50 },
+          { subjectName: "ইংরেজি", terminal: 50, continuous: 50 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 45, continuous: 0 },
+          { subjectName: "সমাজ বিজ্ঞান (সমন্বিত)", terminal: 45, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 25, continuous: 0 },
+          { subjectName: "চারুকলা", terminal: 25, continuous: 0 },
+          { subjectName: "সংগীত", terminal: 50, continuous: 0 },
+        ],
+      },
       {
         examType: "প্রথম প্রান্তিক",
         subjects: [

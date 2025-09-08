@@ -24,7 +24,9 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
+const specialSubjects_c5 = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
+const specialSubjects_c1 = ["শারীরিক শিক্ষা", "চারুকলা", "সংগীত", "সমাজ বিজ্ঞান (সমন্বিত)", "ইসলাম ও নৈতিক শিক্ষা"];
+
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -43,26 +45,60 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   let finalGrade = 'N/A';
 
   const subjectsWithGrades = result.subjects.map((subject) => {
-    const isSpecial = specialSubjects.includes(subject.subjectName);
+    const isSpecialClass5 = student.class >= 3 && specialSubjects_c5.includes(subject.subjectName);
+    const isSpecialClass1 = student.class < 3 && specialSubjects_c1.includes(subject.subjectName);
+    const isSpecial = isSpecialClass5 || isSpecialClass1;
+
     const terminalMarks = subject.terminal;
     const continuousMarks = subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
     
-    const effectiveMaxMarks = (student.class >= 4 && isSpecial) ? 50 : 100;
-    const maxContinuous = (student.class >= 4 && isSpecial) ? 0 : 30;
-    const maxTerminal = (student.class >= 4 && isSpecial) ? 50 : 70;
+    let effectiveMaxMarks = 100;
+    let maxContinuous = 30;
+    let maxTerminal = 70;
+    let passmarkTerminal = 28;
+    let passmarkContinuous = 10;
 
+    if (student.class < 3) { // Class 1-2
+        maxTerminal = 50;
+        maxContinuous = 50;
+        passmarkTerminal = 33/100 * 50;
+        passmarkContinuous = 33/100 * 50;
+        if (subject.subjectName === 'শারীরিক শিক্ষা' || subject.subjectName === 'চারুকলা') {
+             effectiveMaxMarks = 25;
+             maxTerminal = 25;
+             maxContinuous = 0;
+        } else if (isSpecial) {
+             effectiveMaxMarks = 50;
+             maxTerminal = 50;
+             maxContinuous = 0;
+        }
+    } else { // Class 3-5
+        if (isSpecial) {
+            effectiveMaxMarks = 50;
+            maxTerminal = 50;
+            maxContinuous = 0;
+            passmarkTerminal = 33/100 * 50;
+        }
+    }
+    
     let subjectHasFailed = false;
     if (!isSpecial) {
-      if (terminalMarks < 28 || continuousMarks < 10) {
-        subjectHasFailed = true;
-        hasFailedOverall = true;
-      }
+        if (student.class >= 3) {
+            if (terminalMarks < 28 || continuousMarks < 10) {
+                subjectHasFailed = true;
+            }
+        } else {
+            // Add pass/fail logic for class 1/2 if needed
+        }
     } else {
-      if (terminalMarks < (33/100 * 50)) { // 33% of 50 for special subjects
-        subjectHasFailed = true;
+        if (terminalMarks < (33/100 * effectiveMaxMarks)) {
+             subjectHasFailed = true;
+        }
+    }
+
+    if(subjectHasFailed) {
         hasFailedOverall = true;
-      }
     }
 
     const { grade, gpa } = subjectHasFailed 
@@ -116,6 +152,15 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   
   const currentYear = new Date().getFullYear();
 
+  const getClassTeacherName = (sClass: number) => {
+      if (sClass < 3) return "শাকিলা বেগম";
+      return "ফরিদা ইয়াছমীন";
+  }
+
+  const maxContinuousMarks = student.class < 3 ? 50 : 30;
+  const maxTerminalMarks = student.class < 3 ? 50 : 70;
+
+
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
@@ -165,8 +210,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               <TableHeader>
                 <TableRow className="bg-gray-100 hover:bg-gray-100">
                   <TableHead className="px-3 py-2 font-bold text-gray-700 w-[25%]">বিষয়</TableHead>
-                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">{getTerminalExamName(result.examType)} ({toBengaliNumber(subjectsWithGrades.find(s=>!s.isSpecial)?.maxTerminal || 70)})</TableHead>
-                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(subjectsWithGrades.find(s=>!s.isSpecial)?.maxContinuous || 30)})</TableHead>
+                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">{getTerminalExamName(result.examType)} ({toBengaliNumber(maxTerminalMarks)})</TableHead>
+                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(maxContinuousMarks)})</TableHead>
                   <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">মোট নম্বর ({toBengaliNumber(100)})</TableHead>
                   <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">প্রাপ্ত গ্রেড</TableHead>
                 </TableRow>
@@ -179,7 +224,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                     </TableCell>
                     <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
                     <TableCell className="text-center px-3 py-2">
-                      {subject.isSpecial ? '-' : toBengaliNumber(subject.continuous)}
+                      {subject.isSpecial || student.class < 3 && subject.continuous === 0 ? '-' : toBengaliNumber(subject.continuous)}
                     </TableCell>
                     <TableCell className="text-center font-semibold px-3 py-2">
                       {toBengaliNumber(subject.totalMarks)}
@@ -203,7 +248,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         </CardContent>
          <CardFooter className="flex justify-between items-center mt-8 pt-8 border-t px-6 print:mt-32">
             <div className="text-center">
-                <p className="border-t border-black pt-2 px-8">ফরিদা ইয়াছমীন</p>
+                <p className="border-t border-black pt-2 px-8">{getClassTeacherName(student.class)}</p>
                 <p> শ্রেণি শিক্ষকের স্বাক্ষর</p>
             </div>
             <div className="text-center">
