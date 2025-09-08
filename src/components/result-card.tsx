@@ -24,7 +24,7 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "স্বাস্থ্য শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
+const specialSubjects_c3_5 = ["স্বাস্থ্য শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত", "শারীরিক শিক্ষা"];
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
