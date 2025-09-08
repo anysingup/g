@@ -43,7 +43,7 @@ export function ResultCard({ student, result }: ResultCardProps) {
 
   return (
     <Card className="w-full max-w-4xl mx-auto mt-8 animate-fade-in shadow-lg">
-      <CardHeader className="text-center">
+      <CardHeader className="text-center p-4">
         <CardTitle className="text-2xl font-headline">মার্কশিট</CardTitle>
         <CardDescription>
           {result.examType} - {new Date().getFullYear()}
@@ -61,46 +61,48 @@ export function ResultCard({ student, result }: ResultCardProps) {
           </p>
         </div>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>বিষয়</TableHead>
-              <TableHead className="text-right">প্রান্তিক মূল্যায়ন (৭০)</TableHead>
-              <TableHead className="text-right">ধারাবাহিক মূল্যায়ন (৩০)</TableHead>
-              <TableHead className="text-right">মোট নম্বর (১০০)</TableHead>
-              <TableHead className="text-right">গ্রেড</TableHead>
-              <TableHead className="text-right">গ্রেড পয়েন্ট</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {subjectsWithGrades.map((subject) => (
-              <TableRow key={subject.subjectName}>
-                <TableCell className="font-medium">
-                  {subject.subjectName}
-                </TableCell>
-                <TableCell className="text-right">{subject.terminal}</TableCell>
-                <TableCell className="text-right">
-                  {subject.continuous}
-                </TableCell>
-                <TableCell className="text-right font-semibold">
-                  {subject.totalMarks}
-                </TableCell>
-                <TableCell
-                  className={`text-right font-semibold ${
-                    subject.grade === "F" ? "text-destructive" : ""
-                  }`}
-                >
-                  {subject.grade}
-                </TableCell>
-                <TableCell className="text-right">{subject.gpa.toFixed(2)}</TableCell>
+      <CardContent className="p-0 sm:p-6 sm:pt-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-2 sm:px-4">বিষয়</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">প্রান্তিক (৭০)</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">ধারাবাহিক (৩০)</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">মোট (১০০)</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">গ্রেড</TableHead>
+                <TableHead className="text-right px-2 sm:px-4">জিপিএ</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {subjectsWithGrades.map((subject) => (
+                <TableRow key={subject.subjectName}>
+                  <TableCell className="font-medium px-2 sm:px-4">
+                    {subject.subjectName}
+                  </TableCell>
+                  <TableCell className="text-right px-2 sm:px-4">{subject.terminal}</TableCell>
+                  <TableCell className="text-right px-2 sm:px-4">
+                    {subject.continuous}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold px-2 sm:px-4">
+                    {subject.totalMarks}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-semibold px-2 sm:px-4 ${
+                      subject.grade === "F" ? "text-destructive" : ""
+                    }`}
+                  >
+                    {subject.grade}
+                  </TableCell>
+                  <TableCell className="text-right px-2 sm:px-4">{subject.gpa.toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row justify-between items-center bg-muted/50 p-4 rounded-b-lg gap-4">
-        <div className="flex flex-wrap gap-4 font-semibold">
+      <CardFooter className="flex flex-col sm:flex-row justify-between items-center bg-muted/50 p-4 rounded-b-lg gap-4 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 font-semibold">
           <p>
             ফলাফল:{" "}
             <Badge variant={hasFailed ? "destructive" : "default"}>

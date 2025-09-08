@@ -121,10 +121,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
       <header className="w-full max-w-4xl text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">
           হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground px-4 sm:px-0">
           গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম
         </p>
         <p className="text-muted-foreground mt-1">EMIS: 91411050804</p>
@@ -146,7 +146,7 @@ export default function Home() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                   <FormField
                     control={form.control}
                     name="academicYear"
@@ -245,7 +245,7 @@ export default function Home() {
                     )}
                   />
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center pt-2">
                   <Button
                     type="submit"
                     className="w-full max-w-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
@@ -273,11 +273,11 @@ export default function Home() {
       <section className="w-full mt-8">
         {loading && (
           <Card className="w-full max-w-4xl mx-auto">
-            <CardHeader className="items-center">
-              <Skeleton className="h-8 w-1/2" />
-              <Skeleton className="h-4 w-1/4 mt-2" />
+            <CardHeader className="items-center p-4">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-4 w-1/2 mt-2" />
             </CardHeader>
-            <CardContent className="space-y-4 p-6">
+            <CardContent className="space-y-4 p-4">
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
@@ -303,7 +303,7 @@ export default function Home() {
 
       <MultilingualSupport />
 
-      <footer className="mt-16 text-center text-sm text-muted-foreground">
+      <footer className="mt-16 text-center text-sm text-muted-foreground px-4">
         <p>
           &copy; {new Date().getFullYear()} হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়।
           সর্বস্বত্ব সংরক্ষিত।
