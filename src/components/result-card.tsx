@@ -63,7 +63,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         } else {
              hasContinuous = false;
              effectiveMaxMarks = 50;
-             if (subject.subjectName === "শারীরিক ও মানসিক স্বাস্থ্য" || subject.subjectName === "চারু ও কারুকলা") {
+             if (subject.subjectName === "শারীরিক শিক্ষা" || subject.subjectName === "চারু ও কারুকলা") {
                 effectiveMaxMarks = 25;
              }
              if (terminalMarks < (effectiveMaxMarks * 0.4)) { // 40% pass mark
@@ -219,6 +219,10 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                             <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
                           </TableRow>
                         ))}
+                         <TableRow className="bg-gray-200 font-bold hover:bg-gray-200">
+                              <TableCell colSpan={3} className="text-right px-3 py-2 text-lg">সর্বমোট নম্বর</TableCell>
+                              <TableCell colSpan={2} className="text-center px-3 py-2 text-lg">{toBengaliNumber(totalObtainedMarks)} / {toBengaliNumber(totalMaxMarks)}</TableCell>
+                          </TableRow>
                     </TableBody>
                 </Table>
              ) : (
