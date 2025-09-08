@@ -236,15 +236,7 @@ export function ResultCard({ student, result }: ResultCardProps) {
 
   return (
     <>
-      <div className="print:hidden">
-        <ResultCardComponent ref={componentRef} student={student} result={result} />
-      </div>
-
-       <div className="hidden">
-         <div ref={componentRef}>
-            <ResultCardComponent student={student} result={result} />
-         </div>
-       </div>
+      <ResultCardComponent ref={componentRef} student={student} result={result} />
 
       <div className="w-full max-w-4xl mx-auto text-center mt-4 print:hidden">
         <Button onClick={handlePrint}>
