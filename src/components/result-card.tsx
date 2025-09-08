@@ -24,7 +24,7 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c3_5 = ["স্বাস্থ্য শিক্ষা", "চারু ও কারুকলা", "সংগীত"];
+const specialSubjects_c3_5 = ["স্বাস্থ্য শিক্ষা", "চারু ও কারুকলা", "সংগীত", "শারীরিক শিক্ষা", "চারুকলা", "কারুকলা"];
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -71,7 +71,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             }
         }
     } else { // Class 3-5
-        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName) || subject.subjectName === "শারীরিক শিক্ষা";
+        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName);
         hasContinuous = !isSpecial;
         effectiveMaxMarks = isSpecial ? 50 : 100;
         
@@ -100,7 +100,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     
     const isGradedForGpa = isClass1Or2 
         ? true
-        : !specialSubjects_c3_5.includes(subject.subjectName) && subject.subjectName !== "শারীরিক শিক্ষা";
+        : !specialSubjects_c3_5.includes(subject.subjectName);
 
     if (isGradedForGpa) {
       totalGpa += gpa;
