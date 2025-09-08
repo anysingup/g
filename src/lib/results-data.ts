@@ -113,7 +113,7 @@ export const students: Student[] = [
                 { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 30, continuous: 0 },
                 { subjectName: "সমাজ বিজ্ঞান (সমন্বিত)", terminal: 35, continuous: 0 },
                 { subjectName: "শারীরিক শিক্ষা", terminal: 25, continuous: 0 },
-                { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
+                { subjectName: "charukola", terminal: 25, continuous: 0 },
                 { subjectName: "সংগীত", terminal: 50, continuous: 0 },
             ],
         },
