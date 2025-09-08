@@ -570,7 +570,7 @@ export const students: Student[] = [
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
           { subjectName: "বাংলা", terminal: 38, continuous: 0 },
-          { subjectName: "গনিত", terminal: 28, continuous: 0 },
+          { subjectName: "গনیت", terminal: 28, continuous: 0 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 56, continuous: 0 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 38, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 37, continuous: 0 },
@@ -595,7 +595,7 @@ export const students: Student[] = [
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
           { subjectName: "বাংলা", terminal: 33, continuous: 0 },
-          { subjectName: "গনিত", terminal: 23, continuous:継続して...
+          { subjectName: "গনিত", terminal: 23, continuous: 0 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 41, continuous: 0 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 36, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 33, continuous: 0 },
@@ -752,7 +752,7 @@ export const students: Student[] = [
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 38, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 30, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 30, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous:継続して...
+          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "সংগীত", terminal: 30, continuous: 0 },
         ]
       }
