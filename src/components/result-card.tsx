@@ -72,7 +72,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             }
         }
     } else { // Class 3-5 Logic
-        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName) || (student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"].includes(subject.subjectName));
+        const isSpecial = specialSubjects_c3_5.includes(subject.subjectName);
         hasContinuous = !isSpecial;
         
         if(hasContinuous) {
@@ -102,7 +102,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     
     const isGradedForGpa = isClass1Or2 
         ? ["বাংলা", "গনিত", "ইংরেজি"].includes(subject.subjectName)
-        : !specialSubjects_c3_5.includes(subject.subjectName) && !(student.class >= 4 && ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"].includes(subject.subjectName));
+        : !specialSubjects_c3_5.includes(subject.subjectName);
 
     if (isGradedForGpa) {
       totalGpa += gpa;
