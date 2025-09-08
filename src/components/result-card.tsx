@@ -25,8 +25,6 @@ interface ResultCardProps {
 }
 
 const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারু ও কারুকলা", "সংগীত"];
-const specialSubjects_c1_2 = ["সমাজ বিজ্ঞান (সমন্বিত)", "ইসলাম ও নৈতিক শিক্ষা", "শারীরিক ও মানসিক স্বাস্থ্য", "চারু ও কারুকলা", "সংগীত"];
-
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -154,8 +152,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       return "ফরিদা ইয়াছমীন";
   }
 
-  const mainSubjects = subjectsWithGrades.filter(s => s.hasContinuous);
-  const otherSubjects = subjectsWithGrades.filter(s => !s.hasContinuous);
+  const mainSubjects = subjectsWithGrades.filter(s => !s.isSpecial);
+  const otherSubjects = subjectsWithGrades.filter(s => s.isSpecial);
 
 
   return (

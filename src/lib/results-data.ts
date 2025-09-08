@@ -10,6 +10,8 @@ export const allSubjects = [
   "শারীরিক শিক্ষা", // For Class 3-5
   "চারু ও কারুকলা",
   "সংগীত",
+  "বাংলাদেশ ও বিশ্বপরিচয়",
+  "প্রাথমিক বিজ্ঞান",
 ];
 
 export const students: Student[] = [
