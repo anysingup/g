@@ -10,6 +10,7 @@ import { ResultCard } from "@/components/result-card";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { Student, ExamResult } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 type SearchResult = {
   student: Student;
