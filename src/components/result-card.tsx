@@ -62,16 +62,18 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     if (student.class < 3) { // Class 1-2
         maxTerminal = 50;
         maxContinuous = 50;
-        passmarkTerminal = 33/100 * 50;
-        passmarkContinuous = 33/100 * 50;
+        passmarkTerminal = 20;
+        passmarkContinuous = 20;
         if (subject.subjectName === 'শারীরিক শিক্ষা' || subject.subjectName === 'চারুকলা') {
              effectiveMaxMarks = 25;
              maxTerminal = 25;
              maxContinuous = 0;
+             passmarkTerminal = (20/50) * 25; // Pro-rata pass mark
         } else if (isSpecial) {
              effectiveMaxMarks = 50;
              maxTerminal = 50;
              maxContinuous = 0;
+             passmarkTerminal = (20/50) * 50; // Pro-rata pass mark
         }
     } else { // Class 3-5
         if (isSpecial) {
@@ -89,10 +91,12 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                 subjectHasFailed = true;
             }
         } else {
-            // Add pass/fail logic for class 1/2 if needed
+             if (terminalMarks < 20 || continuousMarks < 20) {
+                subjectHasFailed = true;
+            }
         }
     } else {
-        if (terminalMarks < (33/100 * effectiveMaxMarks)) {
+        if (terminalMarks < passmarkTerminal) {
              subjectHasFailed = true;
         }
     }
@@ -224,7 +228,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                     </TableCell>
                     <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
                     <TableCell className="text-center px-3 py-2">
-                      {subject.isSpecial || student.class < 3 && subject.continuous === 0 ? '-' : toBengaliNumber(subject.continuous)}
+                      {subject.isSpecial || (student.class < 3 && subject.continuous === 0) ? '-' : toBengaliNumber(subject.continuous)}
                     </TableCell>
                     <TableCell className="text-center font-semibold px-3 py-2">
                       {toBengaliNumber(subject.totalMarks)}
