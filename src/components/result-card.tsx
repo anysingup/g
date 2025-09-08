@@ -97,26 +97,15 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         </CardHeader>
         
         <CardContent className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
-              <div className="border rounded-lg p-3 bg-gray-50">
-                  <h3 className="font-bold text-gray-800 mb-2 border-b pb-1">শিক্ষার্থীর তথ্য</h3>
-                  <p><span className="font-semibold">নাম:</span> {student.name}</p>
-                  <p><span className="font-semibold">পিতার নাম:</span> {student.fatherName}</p>
-                  <p><span className="font-semibold">মাতার নাম:</span> {student.motherName}</p>
-                  <p><span className="font-semibold">রোল:</span> {toBengaliNumber(student.roll)}</p>
-                  <p><span className="font-semibold">শ্রেণি:</span> {student.class === 1 ? 'প্রথম' : student.class === 2 ? 'দ্বিতীয়' : student.class === 3 ? 'তৃতীয়' : student.class === 4 ? 'চতুর্থ' : 'পঞ্চম'}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6 text-sm">
+              <div className="space-y-1">
+                  <p><span className="font-semibold w-28 inline-block">শিক্ষার্থীর নাম</span>: {student.name}</p>
+                  <p><span className="font-semibold w-28 inline-block">পিতার নাম</span>: {student.fatherName}</p>
+                  <p><span className="font-semibold w-28 inline-block">মাতার নাম</span>: {student.motherName}</p>
               </div>
-              <div className="border rounded-lg p-3 bg-gray-50">
-                  <h3 className="font-bold text-gray-800 mb-2 border-b pb-1">পরীক্ষার তথ্য</h3>
-                  <p><span className="font-semibold">পরীক্ষা:</span> {result.examType}</p>
-                  <p><span className="font-semibold">মোট বিষয়:</span> {toBengaliNumber(result.subjects.length)}টি</p>
-              </div>
-              <div className="border rounded-lg p-3 bg-gray-50">
-                  <h3 className="font-bold text-gray-800 mb-2 border-b pb-1">সামগ্রিক ফলাফল</h3>
-                  <p><span className="font-semibold">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
-                  <p><span className="font-semibold">মোট নম্বর:</span> {toBengaliNumber(totalObtainedMarks)} / {toBengaliNumber(totalMaxMarks)}</p>
-                  {!hasFailed && <p><span className="font-semibold">গ্রেড:</span> {finalGrade}</p>}
-                  {!hasFailed && <p><span className="font-semibold">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
+              <div className="space-y-1">
+                  <p><span className="font-semibold w-28 inline-block">শ্রেণি</span>: {student.class === 1 ? 'প্রথম' : student.class === 2 ? 'দ্বিতীয়' : student.class === 3 ? 'তৃতীয়' : student.class === 4 ? 'চতুর্থ' : 'পঞ্চম'}</p>
+                  <p><span className="font-semibold w-28 inline-block">রোল</span>: {toBengaliNumber(student.roll)}</p>
               </div>
           </div>
           
@@ -160,6 +149,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               </TableBody>
             </Table>
           </div>
+           <div className="mt-4 flex justify-end">
+                <div className="border rounded-lg p-3 bg-gray-50 w-full max-w-xs">
+                    <h3 className="font-bold text-gray-800 mb-2 border-b pb-1">ফলাফলের সারসংক্ষেপ</h3>
+                     <p><span className="font-semibold">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
+                    {!hasFailed && <p><span className="font-semibold">গ্রেড:</span> {finalGrade}</p>}
+                    {!hasFailed && <p><span className="font-semibold">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
+                </div>
+            </div>
         </CardContent>
          <CardFooter className="hidden print:block mt-24 px-6">
               <div className="flex justify-between">
