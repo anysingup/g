@@ -215,28 +215,16 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {mainSubjects.map((subject) => (
+                        {subjectsWithGrades.map((subject) => (
                           <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
                             <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
                             <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
-                            <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.continuous)}</TableCell>
+                            <TableCell className="text-center px-3 py-2">
+                                {subject.hasContinuous ? toBengaliNumber(subject.continuous) : '-'}
+                            </TableCell>
                             <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.totalMarks)}</TableCell>
                             <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
                           </TableRow>
-                        ))}
-                         <TableRow className="bg-gray-100 hover:bg-gray-100">
-                            <TableHead className="px-3 py-2 font-bold text-gray-700">অন্যান্য বিষয়</TableHead>
-                            <TableHead colSpan={2} className="text-center px-3 py-2 font-bold text-gray-700">প্রাপ্ত নম্বর</TableHead>
-                            <TableHead className="text-center px-3 py-2 font-bold text-gray-700">পূর্ণ নম্বর</TableHead>
-                            <TableHead className="text-center px-3 py-2 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
-                        </TableRow>
-                        {otherSubjects.map((subject) => (
-                             <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
-                                <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
-                                <TableCell colSpan={2} className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
-                                <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.maxMarks)}</TableCell>
-                                <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
-                            </TableRow>
                         ))}
                     </TableBody>
                 </Table>
