@@ -74,9 +74,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 66, continuous: 29 },
           { subjectName: "ইংরেজি", terminal: 68, continuous: 30 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 69, continuous: 28 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -99,9 +99,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 30 },
           { subjectName: "ইংরেজি", terminal: 47, continuous: 25 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 58, continuous: 27 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -124,9 +124,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 30 },
           { subjectName: "ইংরেজি", terminal: 53, continuous: 25 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 66, continuous: 29 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -149,9 +149,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 28 },
           { subjectName: "ইংরেজি", terminal: 62, continuous: 28 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 50, continuous: 25 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -174,9 +174,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 59, continuous: 25 },
           { subjectName: "ইংরেজি", terminal: 48, continuous: 24 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 63, continuous: 25 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -199,9 +199,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 59, continuous: 26 },
           { subjectName: "ইংরেজি", terminal: 61, continuous: 27 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 67, continuous: 28 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -224,9 +224,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 30 },
           { subjectName: "ইংরেজি", terminal: 46, continuous: 21 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 58, continuous: 24 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -249,9 +249,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 59, continuous: 25 },
           { subjectName: "ইংরেজি", terminal: 35, continuous: 18 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 47, continuous: 21 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ]
       }
@@ -274,9 +274,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 52, continuous: 26 },
           { subjectName: "ইংরেজি", terminal: 61, continuous: 27 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 67, continuous: 28 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "সংগীত", terminal: 45, continuous: 0 },
         ]
       },
@@ -319,15 +319,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 42, continuous: 0 },
-          { subjectName: "গনিত", terminal: 28, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 54, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 42, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 55, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 56, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 42, continuous: 18 },
+          { subjectName: "গনিত", terminal: 28, continuous: 11 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 54, continuous: 24 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 42, continuous: 21 },
+          { subjectName: "ইংরেজি", terminal: 55, continuous: 24 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 56, continuous: 25 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "সংগীত", terminal: 45, continuous: 0 },
         ]
       }
@@ -344,15 +344,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 32, continuous: 0 },
-          { subjectName: "গনিত", terminal: 25, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 55, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 52, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 47, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 50, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 32, continuous: 15 },
+          { subjectName: "গনিত", terminal: 25, continuous: 15 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 55, continuous: 24 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 52, continuous: 23 },
+          { subjectName: "ইংরেজি", terminal: 47, continuous: 21 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 50, continuous: 22 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "সংগীত", terminal: 45, continuous: 0 },
         ]
       }
@@ -369,15 +369,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 38, continuous: 0 },
-          { subjectName: "গনিত", terminal: 14, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 57, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 54, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 40, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 38, continuous: 15 },
+          { subjectName: "গনিত", terminal: 14, continuous: 12 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 57, continuous: 25 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 54, continuous: 20 },
+          { subjectName: "ইংরেজি", terminal: 40, continuous: 20 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 20 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
           { subjectName: "সংগীত", terminal: 45, continuous: 0 },
         ]
       }
@@ -394,15 +394,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 23, continuous: 0 },
-          { subjectName: "গনিত", terminal: 23, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 33, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 26, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 48, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 25, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 23, continuous: 12 },
+          { subjectName: "গনিত", terminal: 23, continuous: 12 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 33, continuous: 15 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 26, continuous: 12 },
+          { subjectName: "ইংরেজি", terminal: 48, continuous: 21 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 25, continuous: 15 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -419,15 +419,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 39, continuous: 0 },
-          { subjectName: "গনিত", terminal: 25, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 52, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 49, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 39, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 39, continuous: 21 },
+          { subjectName: "গনিত", terminal: 25, continuous: 15 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 52, continuous: 25 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 49, continuous: 21 },
+          { subjectName: "ইংরেজি", terminal: 39, continuous: 20 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 20 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -444,15 +444,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 45, continuous: 0 },
-          { subjectName: "গনিত", terminal: 45, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 60, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 44, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 46, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 40, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 45, continuous: 20 },
+          { subjectName: "গনিত", terminal: 45, continuous: 21 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 60, continuous: 27 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 44, continuous: 21 },
+          { subjectName: "ইংরেজি", terminal: 46, continuous: 21 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 40, continuous: 18 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -469,15 +469,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 40, continuous: 0 },
-          { subjectName: "গনিত", terminal: 23, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 56, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 35, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 45, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 37, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 40, continuous: 18 },
+          { subjectName: "গনিত", terminal: 23, continuous: 20 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 56, continuous: 24 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 35, continuous: 15 },
+          { subjectName: "ইংরেজি", terminal: 45, continuous: 21 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 37, continuous: 18 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -494,15 +494,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 40, continuous: 0 },
-          { subjectName: "গনিত", terminal: 36, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 44, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 38, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 48, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 43, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 40, continuous: 18 },
+          { subjectName: "গনিত", terminal: 36, continuous: 16 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 44, continuous: 20 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 38, continuous: 16 },
+          { subjectName: "ইংরেজি", terminal: 48, continuous: 16 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 43, continuous: 20 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -519,15 +519,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 33, continuous: 0 },
-          { subjectName: "গনিত", terminal: 23, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 36, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 37, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 31, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 37, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 33, continuous: 15 },
+          { subjectName: "গনিত", terminal: 23, continuous: 15 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 36, continuous: 15 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 37, continuous: 16 },
+          { subjectName: "ইংরেজি", terminal: 31, continuous: 15 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 37, continuous: 15 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 40, continuous: 0 },
         ]
       }
@@ -544,15 +544,15 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 47, continuous: 0 },
-          { subjectName: "গনিত", terminal: 29, continuous: 0 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 59, continuous: 0 },
-          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 39, continuous: 0 },
-          { subjectName: "ইংরেজি", terminal: 50, continuous: 0 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 38, continuous: 0 },
+          { subjectName: "বাংলা", terminal: 47, continuous: 20 },
+          { subjectName: "গনিত", terminal: 29, continuous: 15 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 59, continuous: 20 },
+          { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 39, continuous: 20 },
+          { subjectName: "ইংরেজি", terminal: 50, continuous: 22 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 38, continuous: 20 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 35, continuous: 0 },
         ]
       }
@@ -575,9 +575,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 38, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 37, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 35, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 35, continuous: 0 },
         ]
       }
@@ -600,9 +600,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 36, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 33, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 43, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 35, continuous: 0 },
         ]
       }
@@ -625,9 +625,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 41, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 42, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 31, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 35, continuous: 0 },
         ]
       }
@@ -650,9 +650,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 40, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 36, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 34, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 35, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 35, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 35, continuous: 0 },
           { subjectName: "সংগীত", terminal: 35, continuous: 0 },
         ]
       }
@@ -675,9 +675,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 36, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 40, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 30, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 30, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "সংগীত", terminal: 30, continuous: 0 },
         ]
       }
@@ -700,9 +700,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 34, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 45, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 49, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 30, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 30, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "সংগীত", terminal: 30, continuous: 0 },
         ]
       }
@@ -725,9 +725,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 37, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 33, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 33, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 30, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 30, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "সংগীত", terminal: 30, continuous: 0 },
         ]
       }
@@ -750,9 +750,9 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 34, continuous: 0 },
           { subjectName: "ইংরেজি", terminal: 23, continuous: 0 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 38, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "চারুকলা", terminal: 30, continuous: 0 },
           { subjectName: "কারুকলা", terminal: 30, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 30, continuous: 0 },
           { subjectName: "সংগীত", terminal: 30, continuous: 0 },
         ]
       }
@@ -780,5 +780,3 @@ export const students: Student[] = [
     ]
   }
 ];
-
-    
