@@ -71,7 +71,7 @@ function ResultDisplay() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-      <div className="mb-4">
+      <div className="mb-4 print:hidden">
         <Button variant="outline" asChild>
             <Link href="/">
                 <ArrowLeft className="mr-2 h-4 w-4" />
