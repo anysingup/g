@@ -142,12 +142,12 @@ export function ResultCard({ student, result }: ResultCardProps) {
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row justify-between items-center bg-muted/50 p-4 rounded-b-lg gap-4 text-center sm:text-left print:bg-transparent">
              <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 font-semibold">
-                <p>
+                <div className="flex items-center gap-2">
                     ফলাফল:{" "}
                     <Badge variant={hasFailed ? "destructive" : "default"}>
                     {finalResult}
                     </Badge>
-                </p>
+                </div>
                 {!hasFailed && <p>গড় জিপিএ: {averageGpa.toFixed(2)}</p>}
             </div>
             <p className="text-xs text-muted-foreground print:hidden">
