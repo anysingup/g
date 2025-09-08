@@ -115,8 +115,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             <h1 className="text-2xl sm:text-3xl font-bold text-blue-700">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
             <p className="text-sm text-gray-600">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
             <p className="text-sm text-gray-600">EMIS: 91411050804</p>
-            <div className="mt-4 border-t pt-2">
-                <h2 className="text-lg font-bold">একাডেমিক ট্রান্সক্রিপ্ট</h2>
+            <div className="mt-4 border-t border-gray-300 pt-4">
+                <h2 className="text-xl font-bold text-blue-700">একাডেমিক ট্রান্সক্রিপ্ট</h2>
                 <p className="text-base text-gray-700">{getTerminalExamName(result.examType)} - {toBengaliNumber(currentYear)}</p>
             </div>
         </CardHeader>
@@ -188,12 +188,10 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         </CardContent>
          <CardFooter className="hidden print:flex justify-between items-center mt-32 px-6">
               <div className="text-center">
-                  <p className="border-t border-black pt-2 w-48">ফরিদা ইয়াছমীন</p>
-                  <p className="text-xs">শ্রেণি শিক্ষকের স্বাক্ষর</p>
+                  <p className="border-t border-black pt-2 w-48">শ্রেণি শিক্ষকের স্বাক্ষর</p>
               </div>
               <div className="text-center">
-                  <p className="border-t border-black pt-2 w-48">মোঃ জসীম উদ্দীন</p>
-                  <p className="text-xs">প্রধান শিক্ষকের স্বাক্ষর</p>
+                  <p className="border-t border-black pt-2 w-48">প্রধান শিক্ষকের স্বাক্ষর</p>
               </div>
           </CardFooter>
           <style jsx global>{`
