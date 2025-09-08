@@ -48,7 +48,12 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     const terminalMarks = subject.terminal;
     const continuousMarks = isSpecial ? 0 : subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
-    const effectiveMaxMarks = isSpecial ? 50 : 100;
+    
+    // For 5th grade, special subjects have max marks 50
+    const effectiveMaxMarks = (student.class === 5 && isSpecial) ? 50 : 100;
+    const maxContinuous = (student.class === 5 && isSpecial) ? 0 : 30;
+    const maxTerminal = (student.class === 5 && isSpecial) ? 50 : 70;
+
 
     const { grade, gpa } = getGradeInfo(totalMarks, effectiveMaxMarks);
 
@@ -64,7 +69,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       gradedSubjectsCount++;
     }
     
-    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks };
+    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks, maxContinuous, maxTerminal };
   });
 
   const validSubjects = gradedSubjectsCount > 0 ? gradedSubjectsCount : 1;
@@ -100,6 +105,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       if (examType === "বার্ষিক") return "বার্ষিক মূল্যায়ন";
       return examType;
   }
+  
+  const currentYear = new Date().getFullYear();
 
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
@@ -110,7 +117,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             <p className="text-sm text-gray-600">EMIS: 91411050804</p>
             <div className="mt-4 border-t pt-2">
                 <h2 className="text-lg font-bold">একাডেমিক ট্রান্সক্রিপ্ট</h2>
-                <p className="text-base text-gray-700">{result.examType} - {toBengaliNumber(new Date().getFullYear())}</p>
+                <p className="text-base text-gray-700">{getTerminalExamName(result.examType)} - {toBengaliNumber(currentYear)}</p>
             </div>
         </CardHeader>
         
@@ -126,7 +133,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               </div>
               <div className="rounded-lg p-3 bg-blue-50 border border-blue-200">
                   <h3 className="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">পরীক্ষার তথ্য</h3>
-                  <p><span className="font-semibold">পরীক্ষা:</span> {result.examType}</p>
+                  <p><span className="font-semibold">পরীক্ষা:</span> {getTerminalExamName(result.examType)}</p>
                   <p><span className="font-semibold">মোট বিষয়:</span> {toBengaliNumber(result.subjects.length)}টি</p>
               </div>
               <div className="rounded-lg p-3 bg-purple-50 border border-purple-200">
@@ -143,8 +150,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="px-2 sm:px-4 text-left font-bold text-gray-700">বিষয়</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">{getTerminalExamName(result.examType)} ({toBengaliNumber(70)})</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(30)})</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">{getTerminalExamName(result.examType)} ({toBengaliNumber(subjectsWithGrades.find(s=>!s.isSpecial)?.maxTerminal || 70)})</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(subjectsWithGrades.find(s=>!s.isSpecial)?.maxContinuous || 30)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">মোট নম্বর ({toBengaliNumber(100)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
                 </TableRow>
