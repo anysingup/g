@@ -42,12 +42,12 @@ export const students: Student[] = [
       {
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
-          { subjectName: "বাংলা", terminal: 45, continuous: 20 },
-          { subjectName: "ইংরেজি", terminal: 62, continuous: 28 },
-          { subjectName: "গনিত", terminal: 60, continuous: 28 },
-          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 60, continuous: 30 },
+          { subjectName: "বাংলা", terminal: 68, continuous: 25 },
+          { subjectName: "ইংরেজি", terminal: 70, continuous: 28 },
+          { subjectName: "গনিত", terminal: 69, continuous: 28 },
+          { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 69, continuous: 30 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 28 },
-          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 50, continuous: 30 },
+          { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 69, continuous: 30 },
           { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
           { subjectName: "চারু ও কারুকলা", terminal: 50, continuous: 0 },
           { subjectName: "সংগীত", terminal: 50, continuous: 0 },
