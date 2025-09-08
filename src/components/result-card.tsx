@@ -24,7 +24,7 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
+const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "স্বাস্থ্য শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -148,6 +148,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
 
   const getClassTeacherName = (sClass: number) => {
       if (sClass === 1 || sClass === 2) return "শাকিলা বেগম";
+      if (sClass === 3) return "ফরিদা ইয়াছমীন";
       if (sClass === 4) return "শাহানা আকতার খানম";
       return "ফরিদা ইয়াছমীন";
   }
