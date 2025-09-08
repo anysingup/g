@@ -47,12 +47,9 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     const maxMarks = isSpecial ? 50 : 100;
     const terminalMarks = subject.terminal;
     
-    // As per new design, continuous assessment is 30, and terminal is 70 for regular subjects
-    // For special subjects, terminal is 50, continuous is 0.
     const continuousMarks = isSpecial ? 0 : subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
     
-    // Adjust max marks for subjects without continuous assessment
     const effectiveMaxMarks = isSpecial ? 50 : 100;
 
     const { grade, gpa } = getGradeInfo(totalMarks, effectiveMaxMarks);
@@ -77,7 +74,6 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   const finalResult = hasFailed ? "অকৃতকার্য" : "কৃতকার্য";
   
   if (!hasFailed) {
-      // The grade is based on GPA, not overall percentage in the provided design.
       if (averageGpa >= 5.0) finalGrade = "A+";
       else if (averageGpa >= 4.0) finalGrade = "A";
       else if (averageGpa >= 3.5) finalGrade = "A-";
@@ -105,7 +101,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
         <CardHeader className="text-center p-4 border-b-2 border-gray-100 print:border-b-0">
             <h1 className="text-2xl sm:text-3xl font-bold text-blue-700">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
-            <p className="text-sm text-gray-600">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
+            <p className="text-sm text-gray-600">গ্রামঃ হরিণখাইন, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
             <p className="text-sm text-gray-600">EMIS: 91411050804</p>
             <div className="mt-4">
                 <h2 className="text-lg font-bold bg-gray-100 py-1 px-4 inline-block rounded-md border">একাডেমিক ট্রান্সক্রিপ্ট</h2>
@@ -206,19 +202,19 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                       flex-direction: column;
                       justify-content: space-between;
                   }
-                  .print\:hidden {
+                  .print\\:hidden {
                       display: none;
                   }
-                  .print\:flex {
+                  .print\\:flex {
                       display: flex;
                   }
-                  .print\:shadow-none {
+                  .print\\:shadow-none {
                       box-shadow: none;
                   }
-                   .print\:border-0 {
+                   .print\\:border-0 {
                       border-width: 0;
                   }
-                  .print\:border-b-0 {
+                  .print\\:border-b-0 {
                       border-bottom-width: 0;
                   }
               }
