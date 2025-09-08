@@ -71,7 +71,6 @@ export function ResultCard({ student, result }: ResultCardProps) {
         <Card className="w-full max-w-4xl mx-auto mt-8 animate-fade-in shadow-lg print:shadow-none print:border-0">
           <CardHeader className="text-center p-4">
             <div className="flex justify-center items-center mb-4">
-                <img src="https://i.ibb.co/Gvx0gN9/logo.png" alt="School Logo" className="h-16 w-16 mr-4" />
                 <div>
                     <h1 className="text-3xl font-bold text-primary">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
                     <p className="text-muted-foreground">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>

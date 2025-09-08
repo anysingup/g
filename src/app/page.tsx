@@ -122,7 +122,6 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
       <header className="w-full max-w-4xl text-center mb-8 flex flex-col items-center">
-        <Image src="https://i.ibb.co/Gvx0gN9/logo.png" alt="School Logo" width={80} height={80} className="mb-4" />
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">
           হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়
         </h1>
