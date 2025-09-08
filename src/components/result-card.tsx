@@ -109,32 +109,37 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
-        <CardHeader className="text-center p-4 print:p-2 border-b-2 border-black relative">
+        <CardHeader className="text-center p-4 print:p-2 border-b-2 border-gray-200">
             <h1 className="text-3xl font-bold text-blue-800">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
-            <p className="text-base text-gray-700 font-semibold">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
-            <p className="text-base text-gray-700 font-semibold">EMIS: 91411050804</p>
-            <div className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-black"></div>
-            <div className="mt-2">
-                <h2 className="text-2xl font-bold text-green-700 inline-block px-4 py-1 border-2 border-green-700 rounded-lg">একাডেমিক ট্রান্সক্রিপ্ট</h2>
-                <p className="text-lg text-gray-800 font-bold mt-2">{getTerminalExamName(result.examType)} - {toBengaliNumber(currentYear)}</p>
+            <p className="text-base text-gray-700">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
+            <p className="text-base text-gray-700">EMIS: 91411050804</p>
+            <div className="mt-4">
+                <h2 className="text-2xl font-bold text-blue-700">একাডেমিক ট্রান্সক্রিপ্ট</h2>
+                <p className="text-lg text-gray-600 font-semibold">{getTerminalExamName(result.examType)} - {toBengaliNumber(currentYear)}</p>
             </div>
         </CardHeader>
         
         <CardContent className="p-4 sm:p-6 print:p-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-base">
-              <div className="rounded-lg p-3 bg-blue-50 border border-blue-200">
-                  <p><span className="font-semibold w-28 inline-block">শিক্ষার্থীর নাম</span>: {student.name}</p>
-                  <p><span className="font-semibold w-28 inline-block">পিতার নাম</span>: {student.fatherName}</p>
-                  <p><span className="font-semibold w-28 inline-block">মাতার নাম</span>: {student.motherName}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
+              <div className="rounded-lg p-4 bg-green-50 border border-green-200">
+                  <h3 className="font-bold text-green-800 mb-2">শিক্ষার্থীর তথ্য</h3>
+                  <p><span className="font-semibold w-24 inline-block">নাম:</span> {student.name}</p>
+                  <p><span className="font-semibold w-24 inline-block">পিতার নাম:</span> {student.fatherName}</p>
+                  <p><span className="font-semibold w-24 inline-block">মাতার নাম:</span> {student.motherName}</p>
+                  <p><span className="font-semibold w-24 inline-block">রোল:</span> {toBengaliNumber(student.roll)}</p>
+                  <p><span className="font-semibold w-24 inline-block">শ্রেণি:</span> {getClassName(student.class)}</p>
               </div>
-              <div className="rounded-lg p-3 bg-green-50 border border-green-200">
-                  <p><span className="font-semibold w-20 inline-block">শ্রেণি</span>: {getClassName(student.class)}</p>
-                  <p><span className="font-semibold w-20 inline-block">রোল</span>: {toBengaliNumber(student.roll)}</p>
+              <div className="rounded-lg p-4 bg-blue-50 border border-blue-200">
+                  <h3 className="font-bold text-blue-800 mb-2">পরীক্ষার তথ্য</h3>
+                  <p><span className="font-semibold w-24 inline-block">পরীক্ষা:</span> {result.examType}</p>
+                  <p><span className="font-semibold w-24 inline-block">মোট বিষয়:</span> {toBengaliNumber(subjectsWithGrades.length)}টি</p>
               </div>
-              <div className="rounded-lg p-3 bg-purple-50 border border-purple-200">
-                  <p><span className="font-semibold">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
-                  {!hasFailed && <p><span className="font-semibold">গ্রেড:</span> {finalGrade}</p>}
-                  {!hasFailed && <p><span className="font-semibold">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
+              <div className="rounded-lg p-4 bg-purple-50 border border-purple-200">
+                  <h3 className="font-bold text-purple-800 mb-2">সামগ্রিক ফলাফল</h3>
+                  <p><span className="font-semibold w-24 inline-block">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
+                  <p><span className="font-semibold w-24 inline-block">মোট নম্বর:</span> {toBengaliNumber(totalObtainedMarks)}/{toBengaliNumber(totalMaxMarks)}</p>
+                  {!hasFailed && <p><span className="font-semibold w-24 inline-block">গ্রেড:</span> {finalGrade}</p>}
+                  {!hasFailed && <p><span className="font-semibold w-24 inline-block">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
               </div>
           </div>
           
