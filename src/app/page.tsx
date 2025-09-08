@@ -79,7 +79,8 @@ export default function Home() {
       const student = students.find(
         (s) =>
           s.class === parseInt(data.class) &&
-          s.roll === parseInt(data.rollNumber)
+          s.roll === parseInt(data.rollNumber) &&
+          data.academicYear === "2025"
       );
 
       if (student) {
@@ -103,9 +104,15 @@ export default function Home() {
           );
         }
       } else {
-        setError(
-          "এই রোল নম্বরের কোনো শিক্ষার্থীকে পাওয়া যায়নি। অনুগ্রহ করে শ্রেণী ও রোল নম্বর পরীক্ষা করুন।"
-        );
+        if (data.academicYear !== "2025") {
+             setError(
+            "শুধুমাত্র ২০২৫ সালের ফলাফল পাওয়া যাবে।"
+          );
+        } else {
+            setError(
+            "এই রোল নম্বরের কোনো শিক্ষার্থীকে পাওয়া যায়নি। অনুগ্রহ করে শ্রেণী ও রোল নম্বর পরীক্ষা করুন।"
+            );
+        }
       }
       setLoading(false);
     }, 1500);
@@ -157,8 +164,11 @@ export default function Home() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="2025">২০২৫</SelectItem>
-                            <SelectItem value="2024">২০২৪</SelectItem>
-                            <SelectItem value="2023">২০২৩</SelectItem>
+                            <SelectItem value="2026">২০২৬</SelectItem>
+                            <SelectItem value="2027">২০২৭</SelectItem>
+                            <SelectItem value="2028">২০২৮</SelectItem>
+                            <SelectItem value="2029">২০২৯</SelectItem>
+                            <SelectItem value="2030">২০৩০</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
