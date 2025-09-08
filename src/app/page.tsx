@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { students, allSubjects } from "@/lib/results-data";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,16 +29,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ResultCard } from "@/components/result-card";
 import { MultilingualSupport } from "@/components/multilingual-support";
-import {
-  AlertCircle,
-  Loader2,
-  Search,
-} from "lucide-react";
-import type { Student, ExamResult } from "@/lib/types";
+import { Loader2, Search } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const FormSchema = z.object({
   academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
@@ -51,15 +44,10 @@ const FormSchema = z.object({
     .min(1, { message: "রোল নম্বর দিন।" }),
 });
 
-type SearchResult = {
-  student: Student;
-  result: ExamResult;
-} | null;
-
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState<SearchResult>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -73,50 +61,9 @@ export default function Home() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true);
-    setSearchResult(null);
     setError(null);
-
-    setTimeout(() => {
-      const student = students.find(
-        (s) =>
-          s.class === parseInt(data.class) &&
-          s.roll === parseInt(data.rollNumber) &&
-          data.academicYear === "2025"
-      );
-
-      if (student) {
-        const result = student.results.find(
-          (r) => r.examType === data.examType
-        );
-        if (result) {
-          const subjects = allSubjects.map((subName) => {
-            const found = result.subjects.find(
-              (s) => s.subjectName === subName
-            );
-            return (
-              found || { subjectName: subName, terminal: 0, continuous: 0 }
-            );
-          });
-
-          setSearchResult({ student, result: { ...result, subjects } });
-        } else {
-          setError(
-            `এই শিক্ষার্থীর জন্য "${data.examType}" পরীক্ষার ফলাফল পাওয়া যায়নি।`
-          );
-        }
-      } else {
-        if (data.academicYear !== "2025") {
-             setError(
-            "শুধুমাত্র ২০২৫ সালের ফলাফল পাওয়া যাবে।"
-          );
-        } else {
-            setError(
-            "এই রোল নম্বরের কোনো শিক্ষার্থীকে পাওয়া যায়নি। অনুগ্রহ করে শ্রেণী ও রোল নম্বর পরীক্ষা করুন।"
-            );
-        }
-      }
-      setLoading(false);
-    }, 1500);
+    const params = new URLSearchParams(data);
+    router.push(`/result?${params.toString()}`);
   }
 
   return (
@@ -155,7 +102,7 @@ export default function Home() {
                       <FormItem>
                         <FormLabel>শিক্ষাবর্ষ</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValuechange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -246,6 +193,13 @@ export default function Home() {
                     )}
                   />
                 </div>
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>ত্রুটি</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
                 <div className="flex justify-center pt-2">
                   <Button
                     type="submit"
@@ -260,7 +214,7 @@ export default function Home() {
                     ) : (
                       <>
                         <Search className="mr-2 h-4 w-4" />
-                        ফলাফল খুঁজুন
+                        ফলাফল দেখুন
                       </>
                     )}
                   </Button>
@@ -270,37 +224,6 @@ export default function Home() {
           </CardContent>
         </Card>
       </main>
-
-      <section className="w-full mt-8">
-        {loading && (
-          <Card className="w-full max-w-4xl mx-auto">
-            <CardHeader className="items-center p-4">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-4 w-1/2 mt-2" />
-            </CardHeader>
-            <CardContent className="space-y-4 p-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </CardContent>
-          </Card>
-        )}
-        {error && (
-          <Alert variant="destructive" className="max-w-lg mx-auto">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>ত্রুটি</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {searchResult && (
-          <ResultCard
-            student={searchResult.student}
-            result={searchResult.result}
-          />
-        )}
-      </section>
 
       <MultilingualSupport />
 
