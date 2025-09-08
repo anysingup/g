@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { students, allSubjects } from "@/lib/results-data";
+import { students, subjects_c1_2, subjects_c3_5 } from "@/lib/results-data";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResultCard } from "@/components/result-card";
@@ -36,10 +36,12 @@ function ResultDisplay() {
       setLoading(false);
       return;
     }
+    
+    const sClass = parseInt(studentClass);
 
     const student = students.find(
       (s) =>
-        s.class === parseInt(studentClass) &&
+        s.class === sClass &&
         s.roll === parseInt(rollNumber) &&
         academicYear === "2025"
     );
@@ -47,6 +49,7 @@ function ResultDisplay() {
     if (student) {
       const result = student.results.find((r) => r.examType === examType);
       if (result) {
+        const allSubjects = sClass <= 2 ? subjects_c1_2 : subjects_c3_5;
         const subjects = allSubjects.map((subName) => {
           const found = result.subjects.find((s) => s.subjectName === subName);
           return found || { subjectName: subName, terminal: 0, continuous: 0 };
