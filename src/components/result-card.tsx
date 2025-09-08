@@ -24,7 +24,7 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারু ও কারুকলা", "সংগীত"];
+const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -77,7 +77,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         
         if(hasContinuous) {
             totalMarks += continuousMarks;
-            if (terminalMarks < 28 || continuousMarks < 10) {
+            if (terminalMarks < 28 || continuousMarks < 10) { // Assuming 70 for terminal, 30 for continuous
                 subjectHasFailed = true;
             }
         } else {
@@ -98,9 +98,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     totalObtainedMarks += totalMarks;
     totalMaxMarks += effectiveMaxMarks;
     
-    // GPA calculation logic
     const isGradedForGpa = isClass1Or2 
-        ? true // All subjects are graded for GPA in class 1-2
+        ? true
         : !specialSubjects_c3_5.includes(subject.subjectName);
 
     if (isGradedForGpa) {
@@ -151,10 +150,6 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       if (sClass < 3) return "শাকিলা বেগম";
       return "ফরিদা ইয়াছমীন";
   }
-
-  const mainSubjects = subjectsWithGrades.filter(s => !s.isSpecial);
-  const otherSubjects = subjectsWithGrades.filter(s => s.isSpecial);
-
 
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
@@ -230,38 +225,24 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-100 hover:bg-gray-100">
-                      <TableHead className="px-3 py-2 font-bold text-gray-700 w-[25%]">বিষয়</TableHead>
-                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">প্রান্তিক (৭০)</TableHead>
-                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">ধারাবাহিক (৩০)</TableHead>
-                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">মোট নম্বর</TableHead>
-                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">প্রাপ্ত গ্রেড</TableHead>
+                      <TableHead className="px-3 py-2 font-bold text-gray-700">বিষয়</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">২য় প্রান্তিক মূল্যায়ন (৭০)</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন (৩০)</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">মোট নম্বর (১০০)</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mainSubjects.map((subject) => (
+                    {subjectsWithGrades.map((subject) => (
                       <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
                         <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
                         <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
-                        <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.continuous)}</TableCell>
+                         <TableCell className="text-center px-3 py-2">
+                            {subject.hasContinuous ? toBengaliNumber(subject.continuous) : '-'}
+                        </TableCell>
                         <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.totalMarks)}</TableCell>
                         <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
                       </TableRow>
-                    ))}
-                    {otherSubjects.length > 0 && (
-                        <TableRow className="bg-gray-100 hover:bg-gray-100">
-                          <TableHead className="px-3 py-2 font-bold text-gray-700">বিষয়</TableHead>
-                          <TableHead colSpan={2} className="text-center px-3 py-2 font-bold text-gray-700">প্রান্তিক মূল্যায়ন</TableHead>
-                          <TableHead className="text-center px-3 py-2 font-bold text-gray-700">মোট নম্বর</TableHead>
-                          <TableHead className="text-center px-3 py-2 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
-                        </TableRow>
-                    )}
-                    {otherSubjects.map((subject) => (
-                        <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
-                            <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
-                            <TableCell colSpan={2} className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
-                            <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.totalMarks)}</TableCell>
-                            <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
-                        </TableRow>
                     ))}
                      <TableRow className="bg-gray-200 font-bold hover:bg-gray-200">
                           <TableCell colSpan={3} className="text-right px-3 py-2 text-lg">সর্বমোট নম্বর</TableCell>
