@@ -38,27 +38,37 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   let totalGpa = 0;
   let totalObtainedMarks = 0;
   let totalMaxMarks = 0;
-  let hasFailed = false;
+  let hasFailedOverall = false;
   let gradedSubjectsCount = 0;
   let finalGrade = 'N/A';
 
   const subjectsWithGrades = result.subjects.map((subject) => {
     const isSpecial = specialSubjects.includes(subject.subjectName);
     const terminalMarks = subject.terminal;
-    const continuousMarks = isSpecial ? 0 : subject.continuous;
+    const continuousMarks = subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
     
     const effectiveMaxMarks = (student.class >= 4 && isSpecial) ? 50 : 100;
     const maxContinuous = (student.class >= 4 && isSpecial) ? 0 : 30;
     const maxTerminal = (student.class >= 4 && isSpecial) ? 50 : 70;
 
-
-    const { grade, gpa } = getGradeInfo(totalMarks, effectiveMaxMarks);
-
-    if (grade === "F") {
-      hasFailed = true;
+    let subjectHasFailed = false;
+    if (!isSpecial) {
+      if (terminalMarks < 28 || continuousMarks < 10) {
+        subjectHasFailed = true;
+        hasFailedOverall = true;
+      }
+    } else {
+      if (terminalMarks < (33/100 * 50)) { // 33% of 50 for special subjects
+        subjectHasFailed = true;
+        hasFailedOverall = true;
+      }
     }
-    
+
+    const { grade, gpa } = subjectHasFailed 
+        ? { grade: "F", gpa: 0.0 } 
+        : getGradeInfo(totalMarks, effectiveMaxMarks);
+
     totalObtainedMarks += totalMarks;
     totalMaxMarks += effectiveMaxMarks;
     
@@ -67,14 +77,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       gradedSubjectsCount++;
     }
     
-    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks, maxContinuous, maxTerminal };
+    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks, maxContinuous, maxTerminal, hasFailed: subjectHasFailed };
   });
 
   const validSubjects = gradedSubjectsCount > 0 ? gradedSubjectsCount : 1;
-  const averageGpa = hasFailed ? 0 : totalGpa / validSubjects;
-  const finalResult = hasFailed ? "অকৃতকার্য" : "কৃতকার্য";
+  const averageGpa = hasFailedOverall ? 0 : totalGpa / validSubjects;
+  const finalResult = hasFailedOverall ? "অকৃতকার্য" : "কৃতকার্য";
   
-  if (!hasFailed) {
+  if (!hasFailedOverall) {
       if (averageGpa >= 5.0) finalGrade = "A+";
       else if (averageGpa >= 4.0) finalGrade = "A";
       else if (averageGpa >= 3.5) finalGrade = "A-";
@@ -139,10 +149,10 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               </div>
               <div className="rounded-lg p-4 bg-purple-50 border border-purple-200">
                   <h3 className="font-bold text-purple-800 mb-2 pb-1 border-b border-purple-200">সামগ্রিক ফলাফল</h3>
-                  <p><span className="font-semibold mr-2">ফলাফল:</span><span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
+                  <p><span className="font-semibold mr-2">ফলাফল:</span><span className={`font-bold ${hasFailedOverall ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
                   <p><span className="font-semibold mr-2">মোট নম্বর:</span>{toBengaliNumber(totalObtainedMarks)}/{toBengaliNumber(totalMaxMarks)}</p>
-                  {!hasFailed && <p><span className="font-semibold mr-2">গ্রেড:</span>{finalGrade}</p>}
-                  {!hasFailed && <p><span className="font-semibold mr-2">GPA:</span>{toBengaliNumber(averageGpa.toFixed(2))}</p>}
+                  {!hasFailedOverall && <p><span className="font-semibold mr-2">গ্রেড:</span>{finalGrade}</p>}
+                  {!hasFailedOverall && <p><span className="font-semibold mr-2">GPA:</span>{toBengaliNumber(averageGpa.toFixed(2))}</p>}
               </div>
           </div>
           
