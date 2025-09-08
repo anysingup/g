@@ -14,10 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { getGradeInfo } from "@/lib/utils";
 import type { Student, ExamResult } from "@/lib/types";
 import { Printer } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ResultCardProps {
   student: Student;
@@ -245,10 +246,13 @@ export function ResultCard({ student, result }: ResultCardProps) {
   return (
     <>
       <div className="print:hidden w-full max-w-4xl mx-auto text-center my-4">
-        <Button onClick={handlePrint}>
+        <button
+          onClick={handlePrint}
+          className={cn(buttonVariants({ variant: "default", size: "default" }))}
+        >
           <Printer className="mr-2 h-4 w-4" />
           প্রিন্ট করুন
-        </Button>
+        </button>
       </div>
       
       <ResultCardComponent ref={componentRef} student={student} result={result} />
