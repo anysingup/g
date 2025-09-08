@@ -46,23 +46,30 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     const isSpecial = specialSubjects.includes(subject.subjectName);
     const maxMarks = isSpecial ? 50 : 100;
     const terminalMarks = subject.terminal;
+    
+    // As per new design, continuous assessment is 30, and terminal is 70 for regular subjects
+    // For special subjects, terminal is 50, continuous is 0.
     const continuousMarks = isSpecial ? 0 : subject.continuous;
     const totalMarks = terminalMarks + continuousMarks;
-    const { grade, gpa } = getGradeInfo(totalMarks, maxMarks);
+    
+    // Adjust max marks for subjects without continuous assessment
+    const effectiveMaxMarks = isSpecial ? 50 : 100;
+
+    const { grade, gpa } = getGradeInfo(totalMarks, effectiveMaxMarks);
 
     if (grade === "F") {
       hasFailed = true;
     }
     
     totalObtainedMarks += totalMarks;
-    totalMaxMarks += maxMarks;
+    totalMaxMarks += effectiveMaxMarks;
     
     if (!isSpecial) {
       totalGpa += gpa;
       gradedSubjectsCount++;
     }
     
-    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks };
+    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks };
   });
 
   const validSubjects = gradedSubjectsCount > 0 ? gradedSubjectsCount : 1;
@@ -70,23 +77,33 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   const finalResult = hasFailed ? "অকৃতকার্য" : "কৃতকার্য";
   
   if (!hasFailed) {
-      const overallPercentage = (totalObtainedMarks / totalMaxMarks) * 100;
-      if (overallPercentage >= 80) finalGrade = "A+";
-      else if (overallPercentage >= 70) finalGrade = "A";
-      else if (overallPercentage >= 60) finalGrade = "A-";
-      else if (overallPercentage >= 50) finalGrade = "B";
-      else if (overallPercentage >= 40) finalGrade = "C";
-      else if (overallPercentage >= 33) finalGrade = "D";
+      // The grade is based on GPA, not overall percentage in the provided design.
+      if (averageGpa >= 5.0) finalGrade = "A+";
+      else if (averageGpa >= 4.0) finalGrade = "A";
+      else if (averageGpa >= 3.5) finalGrade = "A-";
+      else if (averageGpa >= 3.0) finalGrade = "B";
+      else if (averageGpa >= 2.0) finalGrade = "C";
+      else if (averageGpa >= 1.0) finalGrade = "D";
       else finalGrade = "F";
   } else {
       finalGrade = "F";
   }
 
+  const getClassName = (sClass: number) => {
+      switch(sClass) {
+          case 1: return 'প্রথম';
+          case 2: return 'দ্বিতীয়';
+          case 3: return 'তৃতীয়';
+          case 4: return 'চতুর্থ';
+          case 5: return 'পঞ্চম';
+          default: return '';
+      }
+  }
 
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
-        <CardHeader className="text-center p-4 border-b-2 border-gray-200 print:border-b-0">
+        <CardHeader className="text-center p-4 border-b-2 border-gray-100 print:border-b-0">
             <h1 className="text-2xl sm:text-3xl font-bold text-blue-700">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
             <p className="text-sm text-gray-600">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
             <p className="text-sm text-gray-600">EMIS: 91411050804</p>
@@ -97,26 +114,37 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         </CardHeader>
         
         <CardContent className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6 text-sm">
-              <div className="space-y-1">
-                  <p><span className="font-semibold w-28 inline-block">শিক্ষার্থীর নাম</span>: {student.name}</p>
-                  <p><span className="font-semibold w-28 inline-block">পিতার নাম</span>: {student.fatherName}</p>
-                  <p><span className="font-semibold w-28 inline-block">মাতার নাম</span>: {student.motherName}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
+              <div className="rounded-lg p-3 bg-green-50 border border-green-200">
+                  <h3 className="font-bold text-green-800 mb-2 border-b border-green-200 pb-1">শিক্ষার্থীর তথ্য</h3>
+                   <p><span className="font-semibold w-24 inline-block">নাম</span>: {student.name}</p>
+                  <p><span className="font-semibold w-24 inline-block">পিতার নাম</span>: {student.fatherName}</p>
+                  <p><span className="font-semibold w-24 inline-block">মাতার নাম</span>: {student.motherName}</p>
+                  <p><span className="font-semibold w-24 inline-block">রোল</span>: {toBengaliNumber(student.roll)}</p>
+                  <p><span className="font-semibold w-24 inline-block">শ্রেণি</span>: {getClassName(student.class)}</p>
               </div>
-              <div className="space-y-1">
-                  <p><span className="font-semibold w-28 inline-block">শ্রেণি</span>: {student.class === 1 ? 'প্রথম' : student.class === 2 ? 'দ্বিতীয়' : student.class === 3 ? 'তৃতীয়' : student.class === 4 ? 'চতুর্থ' : 'পঞ্চম'}</p>
-                  <p><span className="font-semibold w-28 inline-block">রোল</span>: {toBengaliNumber(student.roll)}</p>
+              <div className="rounded-lg p-3 bg-blue-50 border border-blue-200">
+                  <h3 className="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">পরীক্ষার তথ্য</h3>
+                  <p><span className="font-semibold">পরীক্ষা:</span> {result.examType}</p>
+                  <p><span className="font-semibold">মোট বিষয়:</span> {toBengaliNumber(result.subjects.length)}টি</p>
+              </div>
+              <div className="rounded-lg p-3 bg-purple-50 border border-purple-200">
+                  <h3 className="font-bold text-purple-800 mb-2 border-b border-purple-200 pb-1">সামগ্রিক ফলাফল</h3>
+                  <p><span className="font-semibold">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
+                  <p><span className="font-semibold">মোট নম্বর:</span> {toBengaliNumber(totalObtainedMarks)} / {toBengaliNumber(totalMaxMarks)}</p>
+                  {!hasFailed && <p><span className="font-semibold">গ্রেড:</span> {finalGrade}</p>}
+                  {!hasFailed && <p><span className="font-semibold">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
               </div>
           </div>
           
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-100 hover:bg-gray-100">
+                <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="px-2 sm:px-4 text-left font-bold text-gray-700">বিষয়</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">প্রান্তিক মূল্যায়ন (৭০)</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন (৩০)</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">মোট নম্বর (১০০)</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">{result.examType} মূল্যায়ন ({toBengaliNumber(70)})</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(30)})</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">মোট নম্বর ({toBengaliNumber(100)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
                 </TableRow>
               </TableHeader>
@@ -142,30 +170,22 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                     </TableCell>
                   </TableRow>
                 ))}
-                 <TableRow className="bg-gray-50 font-bold hover:bg-gray-50">
-                      <TableCell colSpan={3} className="text-right px-2 sm:px-4">সর্বমোট নম্বর</TableCell>
-                      <TableCell colSpan={2} className="text-left px-2 sm:px-4">{toBengaliNumber(totalObtainedMarks)} / {toBengaliNumber(totalMaxMarks)}</TableCell>
+                 <TableRow className="bg-gray-100 font-bold hover:bg-gray-100">
+                      <TableCell colSpan={3} className="text-right px-2 sm:px-4 text-lg">সর্বমোট নম্বর</TableCell>
+                      <TableCell colSpan={2} className="text-left px-2 sm:px-4 text-lg">{toBengaliNumber(totalObtainedMarks)} / {toBengaliNumber(totalMaxMarks)}</TableCell>
                   </TableRow>
               </TableBody>
             </Table>
           </div>
-           <div className="mt-4 flex justify-end">
-                <div className="border rounded-lg p-3 bg-gray-50 w-full max-w-xs">
-                    <h3 className="font-bold text-gray-800 mb-2 border-b pb-1">ফলাফলের সারসংক্ষেপ</h3>
-                     <p><span className="font-semibold">ফলাফল:</span> <span className={`font-bold ${hasFailed ? 'text-red-600' : 'text-green-600'}`}>{finalResult}</span></p>
-                    {!hasFailed && <p><span className="font-semibold">গ্রেড:</span> {finalGrade}</p>}
-                    {!hasFailed && <p><span className="font-semibold">GPA:</span> {toBengaliNumber(averageGpa.toFixed(2))}</p>}
-                </div>
-            </div>
         </CardContent>
-         <CardFooter className="hidden print:block mt-24 px-6">
-              <div className="flex justify-between">
-                  <div className="text-center">
-                      <p className="border-t border-dashed border-black pt-2 w-48">শ্রেণি শিক্ষকের স্বাক্ষর</p>
-                  </div>
-                  <div className="text-center">
-                      <p className="border-t border-dashed border-black pt-2 w-48">প্রধান শিক্ষকের স্বাক্ষর</p>
-                  </div>
+         <CardFooter className="hidden print:flex justify-between items-center mt-32 px-6">
+              <div className="text-center">
+                  <p className="border-t border-dashed border-black pt-2 w-48">ফরিদা ইয়াছমীন</p>
+                  <p className="text-xs">শ্রেণি শিক্ষকের স্বাক্ষর</p>
+              </div>
+              <div className="text-center">
+                  <p className="border-t border-dashed border-black pt-2 w-48">মোঃ জসীম উদ্দীন</p>
+                  <p className="text-xs">প্রধান শিক্ষকের স্বাক্ষর</p>
               </div>
           </CardFooter>
           <style jsx global>{`
@@ -176,18 +196,21 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
                   }
                   .print-container {
                       width: 100%;
-                      height: 100%;
+                      height: 100vh;
                       position: absolute;
                       top: 0;
                       left: 0;
                       margin: 0;
                       padding: 20px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
                   }
                   .print\:hidden {
                       display: none;
                   }
-                  .print\:block {
-                      display: block;
+                  .print\:flex {
+                      display: flex;
                   }
                   .print\:shadow-none {
                       box-shadow: none;
@@ -209,6 +232,7 @@ ResultCardComponent.displayName = 'ResultCardComponent';
 
 export function ResultCard({ student, result }: ResultCardProps) {
   const componentRef = useRef<HTMLDivElement>(null);
+  
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: `${student.name}-Result`,
@@ -216,7 +240,16 @@ export function ResultCard({ student, result }: ResultCardProps) {
 
   return (
     <>
-      <ResultCardComponent ref={componentRef} student={student} result={result} />
+      <div className="print:hidden">
+        <ResultCardComponent ref={componentRef} student={student} result={result} />
+      </div>
+
+       <div className="hidden">
+         <div ref={componentRef}>
+            <ResultCardComponent student={student} result={result} />
+         </div>
+       </div>
+
       <div className="w-full max-w-4xl mx-auto text-center mt-4 print:hidden">
         <Button onClick={handlePrint}>
           <Printer className="mr-2 h-4 w-4" />
