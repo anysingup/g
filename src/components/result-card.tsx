@@ -24,8 +24,8 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c5 = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
-const specialSubjects_c1 = ["শারীরিক শিক্ষা", "চারুকলা", "সংগীত", "সমাজ বিজ্ঞান (সমন্বিত)", "ইসলাম ও নৈতিক শিক্ষা"];
+const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারু ও কারুকলা", "সংগীত"];
+const specialSubjects_c1_2 = ["সমাজ বিজ্ঞান (সমন্বিত)", "ইসলাম ও নৈতিক শিক্ষা", "শারীরিক ও মানসিক স্বাস্থ্য", "চারু ও কারুকলা", "সংগীত"];
 
 
 function toBengaliNumber(enNumber: number | string) {
@@ -45,60 +45,59 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   let finalGrade = 'N/A';
 
   const subjectsWithGrades = result.subjects.map((subject) => {
-    const isSpecialClass5 = student.class >= 3 && specialSubjects_c5.includes(subject.subjectName);
-    const isSpecialClass1 = student.class < 3 && specialSubjects_c1.includes(subject.subjectName);
-    const isSpecial = isSpecialClass5 || isSpecialClass1;
+    const isClass1_2 = student.class < 3;
+    const isSpecial = isClass1_2 
+      ? specialSubjects_c1_2.includes(subject.subjectName)
+      : specialSubjects_c3_5.includes(subject.subjectName);
 
     const terminalMarks = subject.terminal;
     const continuousMarks = subject.continuous;
-    const totalMarks = terminalMarks + continuousMarks;
     
-    let effectiveMaxMarks = 100;
-    let maxContinuous = 30;
-    let maxTerminal = 70;
-    let passmarkTerminal = 28;
-    let passmarkContinuous = 10;
+    let totalMarks = terminalMarks;
+    if (isClass1_2 && !isSpecial) {
+      totalMarks += continuousMarks;
+    } else if (!isClass1_2) {
+      totalMarks += continuousMarks;
+    }
 
-    if (student.class < 3) { // Class 1-2
+    let effectiveMaxMarks = 100;
+    let maxContinuous = isClass1_2 ? 50 : 30;
+    let maxTerminal = isClass1_2 ? 50 : 70;
+    let passmarkTerminal = isClass1_2 ? 20 : 28;
+    let passmarkContinuous = isClass1_2 ? 20 : 10;
+    
+    let hasContinuous = true;
+
+    if (isClass1_2) { // Class 1-2
+      if(isSpecial) {
+        effectiveMaxMarks = 50;
         maxTerminal = 50;
-        maxContinuous = 50;
         passmarkTerminal = 20;
-        passmarkContinuous = 20;
-        if (subject.subjectName === 'শারীরিক শিক্ষা' || subject.subjectName === 'চারুকলা') {
-             effectiveMaxMarks = 25;
-             maxTerminal = 25;
-             maxContinuous = 0;
-             passmarkTerminal = (20/50) * 25; // Pro-rata pass mark
-        } else if (isSpecial) {
-             effectiveMaxMarks = 50;
-             maxTerminal = 50;
-             maxContinuous = 0;
-             passmarkTerminal = (20/50) * 50; // Pro-rata pass mark
+        hasContinuous = false;
+        if (subject.subjectName === 'শারীরিক ও মানসিক স্বাস্থ্য' || subject.subjectName === 'চারু ও কারুকলা') {
+          effectiveMaxMarks = 25;
+          maxTerminal = 25;
+          passmarkTerminal = 10; // (20/50) * 25
         }
+      }
     } else { // Class 3-5
-        if (isSpecial) {
-            effectiveMaxMarks = 50;
-            maxTerminal = 50;
-            maxContinuous = 0;
-            passmarkTerminal = 33/100 * 50;
-        }
+      if (isSpecial) {
+        effectiveMaxMarks = 50;
+        maxTerminal = 50;
+        passmarkTerminal = 17; // 33% of 50
+        hasContinuous = false;
+      }
     }
     
     let subjectHasFailed = false;
-    if (!isSpecial) {
-        if (student.class >= 3) {
-            if (terminalMarks < 28 || continuousMarks < 10) {
-                subjectHasFailed = true;
-            }
-        } else {
-             if (terminalMarks < 20 || continuousMarks < 20) {
-                subjectHasFailed = true;
-            }
-        }
+    if (hasContinuous) {
+      if (terminalMarks < passmarkTerminal || continuousMarks < passmarkContinuous) {
+        subjectHasFailed = true;
+      }
     } else {
-        if (terminalMarks < passmarkTerminal) {
-             subjectHasFailed = true;
-        }
+      if (terminalMarks < passmarkTerminal) {
+        subjectHasFailed = true;
+      }
     }
 
     if(subjectHasFailed) {
@@ -115,9 +114,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     if (!isSpecial) {
       totalGpa += gpa;
       gradedSubjectsCount++;
+    } else if (!isClass1_2) { // for class 3-5 special subjects are not graded
+        // Not graded for GPA
+    } else { // for class 1-2 special subjects are graded
+      totalGpa += gpa;
+      gradedSubjectsCount++;
     }
     
-    return { ...subject, totalMarks, grade, gpa, isSpecial, maxMarks: effectiveMaxMarks, maxContinuous, maxTerminal, hasFailed: subjectHasFailed };
+    return { ...subject, totalMarks, grade, gpa, isSpecial, hasContinuous, maxMarks: effectiveMaxMarks, maxContinuous, maxTerminal, hasFailed: subjectHasFailed };
   });
 
   const validSubjects = gradedSubjectsCount > 0 ? gradedSubjectsCount : 1;
@@ -160,6 +164,9 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       if (sClass < 3) return "শাকিলা বেগম";
       return "ফরিদা ইয়াছমীন";
   }
+
+  const mainSubjects = subjectsWithGrades.filter(s => s.hasContinuous);
+  const otherSubjects = subjectsWithGrades.filter(s => !s.hasContinuous);
 
   const maxContinuousMarks = student.class < 3 ? 50 : 30;
   const maxTerminalMarks = student.class < 3 ? 50 : 70;
@@ -214,33 +221,37 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               <TableHeader>
                 <TableRow className="bg-gray-100 hover:bg-gray-100">
                   <TableHead className="px-3 py-2 font-bold text-gray-700 w-[25%]">বিষয়</TableHead>
-                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">{getTerminalExamName(result.examType)} ({toBengaliNumber(maxTerminalMarks)})</TableHead>
-                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(maxContinuousMarks)})</TableHead>
-                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">মোট নম্বর ({toBengaliNumber(100)})</TableHead>
+                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">প্রান্তিক ({toBengaliNumber(maxTerminalMarks)})</TableHead>
+                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[20%]">ধারাবাহিক ({toBengaliNumber(maxContinuousMarks)})</TableHead>
+                  <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">মোট নম্বর</TableHead>
                   <TableHead className="text-center px-3 py-2 font-bold text-gray-700 w-[15%]">প্রাপ্ত গ্রেড</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {subjectsWithGrades.map((subject) => (
+                {mainSubjects.map((subject) => (
                   <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
-                    <TableCell className="font-medium px-3 py-2">
-                      {subject.subjectName}
-                    </TableCell>
+                    <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
                     <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
-                    <TableCell className="text-center px-3 py-2">
-                      {subject.isSpecial || (student.class < 3 && subject.continuous === 0) ? '-' : toBengaliNumber(subject.continuous)}
-                    </TableCell>
-                    <TableCell className="text-center font-semibold px-3 py-2">
-                      {toBengaliNumber(subject.totalMarks)}
-                    </TableCell>
-                    <TableCell
-                      className={`text-center font-semibold px-3 py-2 ${
-                        subject.grade === "F" ? "text-destructive" : ""
-                      }`}
-                    >
-                      {subject.grade}
-                    </TableCell>
+                    <TableCell className="text-center px-3 py-2">{toBengaliNumber(subject.continuous)}</TableCell>
+                    <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.totalMarks)}</TableCell>
+                    <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
                   </TableRow>
+                ))}
+                {otherSubjects.length > 0 && (
+                    <TableRow className="bg-gray-100 hover:bg-gray-100">
+                      <TableHead className="px-3 py-2 font-bold text-gray-700">বিষয়</TableHead>
+                      <TableHead colSpan={2} className="text-center px-3 py-2 font-bold text-gray-700">প্রান্তিক মূল্যায়ন</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">মোট নম্বর</TableHead>
+                      <TableHead className="text-center px-3 py-2 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
+                    </TableRow>
+                )}
+                {otherSubjects.map((subject) => (
+                    <TableRow key={subject.subjectName} className="border-b even:bg-gray-50">
+                        <TableCell className="font-medium px-3 py-2">{subject.subjectName}</TableCell>
+                        <TableCell colSpan={2} className="text-center px-3 py-2">{toBengaliNumber(subject.terminal)}</TableCell>
+                        <TableCell className="text-center font-semibold px-3 py-2">{toBengaliNumber(subject.totalMarks)}</TableCell>
+                        <TableCell className={`text-center font-semibold px-3 py-2 ${subject.grade === "F" ? "text-destructive" : ""}`}>{subject.grade}</TableCell>
+                    </TableRow>
                 ))}
                  <TableRow className="bg-gray-200 font-bold hover:bg-gray-200">
                       <TableCell colSpan={3} className="text-right px-3 py-2 text-lg">সর্বমোট নম্বর</TableCell>
