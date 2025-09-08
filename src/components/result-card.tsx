@@ -24,7 +24,7 @@ interface ResultCardProps {
   result: ExamResult;
 }
 
-const specialSubjects_c3_5 = ["স্বাস্থ্য শিক্ষা", "চারু ও কারুকলা", "সংগীত"];
+const specialSubjects_c3_5 = ["শারীরিক শিক্ষা", "চারুকলা", "কারুকলা", "সংগীত"];
 
 function toBengaliNumber(enNumber: number | string) {
     const en = String(enNumber);
@@ -43,6 +43,8 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   let finalGrade = 'N/A';
 
   const isClass1Or2 = student.class === 1 || student.class === 2;
+  const isClass3To5 = student.class >= 3 && student.class <= 5;
+
 
   const subjectsWithGrades = result.subjects.map((subject) => {
     const terminalMarks = subject.terminal;
@@ -64,14 +66,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
              hasContinuous = false;
              if (subject.subjectName === "ইসলাম ও নৈতিক শিক্ষা" || subject.subjectName === "পরিবেশ পরিচিতি (সমন্বিত)" || subject.subjectName === "সংগীত") {
                 effectiveMaxMarks = 50;
-             } else if (subject.subjectName === "স্বাস্থ্য শিক্ষা" || subject.subjectName === "চারু ও কারুকলা") {
+             } else if (subject.subjectName === "চারু ও কারুকলা") {
                 effectiveMaxMarks = 25;
              }
              if (terminalMarks < (effectiveMaxMarks * 0.4)) { // 40% pass mark
                 subjectHasFailed = true;
             }
         }
-    } else { // Class 3-5 Logic
+    } else if (isClass3To5) { // Class 3-5 Logic
         const isSpecial = specialSubjects_c3_5.includes(subject.subjectName);
         hasContinuous = !isSpecial;
         
