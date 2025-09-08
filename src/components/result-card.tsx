@@ -94,6 +94,13 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       }
   }
 
+  const getTerminalExamName = (examType: string) => {
+      if (examType === "প্রথম প্রান্তিক") return "প্রথম প্রান্তিক মূল্যায়ন";
+      if (examType === "দ্বিতীয় প্রান্তিক") return "দ্বিতীয় প্রান্তিক মূল্যায়ন";
+      if (examType === "বার্ষিক") return "বার্ষিক মূল্যায়ন";
+      return examType;
+  }
+
   return (
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
@@ -136,7 +143,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
                   <TableHead className="px-2 sm:px-4 text-left font-bold text-gray-700">বিষয়</TableHead>
-                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">২য় প্রান্তিক মূল্যায়ন ({toBengaliNumber(70)})</TableHead>
+                  <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">{getTerminalExamName(result.examType)} ({toBengaliNumber(70)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">ধারাবাহিক মূল্যায়ন ({toBengaliNumber(30)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">মোট নম্বর ({toBengaliNumber(100)})</TableHead>
                   <TableHead className="text-center px-2 sm:px-4 font-bold text-gray-700">প্রাপ্ত গ্রেড</TableHead>
