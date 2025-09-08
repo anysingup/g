@@ -120,9 +120,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
     <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
         <CardHeader className="text-center p-4 print:p-2 border-b-2 border-gray-200 relative">
-            <h1 className="text-3xl font-bold text-blue-800">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
-            <p className="text-base text-gray-700">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
-            <p className="text-base text-gray-700">EMIS: 91411050804</p>
+            <div className="flex justify-center items-center mb-4">
+                <img src="https://i.ibb.co/9g7v3G1/logo.png" alt="School Logo" className="h-16 w-16 mr-4" />
+                <div>
+                    <h1 className="text-3xl font-bold text-blue-800">হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়</h1>
+                    <p className="text-base text-gray-700">গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম</p>
+                    <p className="text-base text-gray-700">EMIS: 91411050804</p>
+                </div>
+            </div>
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md">
                 <div className="h-px bg-gray-300 w-full"></div>
             </div>
@@ -133,7 +138,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
         </CardHeader>
         
         <CardContent className="p-4 sm:p-6 print:p-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-base">
               <div className="rounded-lg p-4 bg-green-50 border border-green-200">
                   <h3 className="font-bold text-green-800 mb-2 pb-1 border-b border-green-200">শিক্ষার্থীর তথ্য</h3>
                   <p><span className="font-semibold mr-2">নাম:</span>{student.name}</p>
@@ -197,10 +202,10 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
             </Table>
           </div>
         </CardContent>
-         <CardFooter className="hidden print:flex justify-between items-center mt-32 px-6">
+         <CardFooter className="flex justify-between items-center mt-8 pt-8 border-t px-6 print:mt-32">
             <div className="text-center">
                 <p className="border-t border-black pt-2 px-8">ফরিদা ইয়াছমীন</p>
-                <p>শ্রেণি শিক্ষকের স্বাক্ষর</p>
+                <p> শ্রেণি শিক্ষকের স্বাক্ষর</p>
             </div>
             <div className="text-center">
                 <p className="border-t border-black pt-2 px-8">মোঃ জসীম উদ্দীন</p>
