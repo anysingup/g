@@ -198,12 +198,14 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
           </div>
         </CardContent>
          <CardFooter className="hidden print:flex justify-between items-center mt-32 px-6">
-              <div className="text-center">
-                  <p className="border-t border-black pt-2 w-48">শ্রেণি শিক্ষকের স্বাক্ষর</p>
-              </div>
-              <div className="text-center">
-                  <p className="border-t border-black pt-2 w-48">প্রধান শিক্ষকের স্বাক্ষর</p>
-              </div>
+            <div className="text-center">
+                <p className="border-t border-black pt-2 px-8">ফরিদা ইয়াছমীন</p>
+                <p>শ্রেণি শিক্ষকের স্বাক্ষর</p>
+            </div>
+            <div className="text-center">
+                <p className="border-t border-black pt-2 px-8">মোঃ জসীম উদ্দীন</p>
+                <p>প্রধান শিক্ষকের স্বাক্ষর</p>
+            </div>
           </CardFooter>
           <style jsx global>{`
               @media print {
