@@ -45,6 +45,13 @@ function ResultDisplay() {
         setLoading(false);
         return;
     }
+    if (sClass === 3 && sRoll === 18) {
+      setError(
+        "এই শিক্ষার্থীর কোনো তথ্য পাওয়া যায়নি কারণ সে বিদ্যালয়ে ভর্তি নেই।"
+      );
+      setLoading(false);
+      return;
+    }
 
     const student = students.find(
       (s) =>
