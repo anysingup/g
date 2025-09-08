@@ -346,3 +346,5 @@ export function ResultCard({ student, result }: ResultCardProps) {
     </>
   );
 }
+
+    
