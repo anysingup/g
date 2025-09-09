@@ -1959,6 +1959,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 66, continuous: 29 },
           { subjectName: "ইংরেজি", terminal: 68, continuous: 30 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 69, continuous: 28 },
+          { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
+          { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
+          { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ],
       },
     ],
@@ -1980,6 +1984,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 70, continuous: 30 },
           { subjectName: "ইংরেজি", terminal: 47, continuous: 25 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 58, continuous: 27 },
+          { subjectName: "চারুকলা", terminal: 50, continuous: 0 },
+          { subjectName: "কারুকলা", terminal: 50, continuous: 0 },
+          { subjectName: "শারীরিক শিক্ষা", terminal: 50, continuous: 0 },
+          { subjectName: "সংগীত", terminal: 50, continuous: 0 },
         ],
       },
     ],
@@ -1988,7 +1996,7 @@ export const students: Student[] = [
     id: "c5r4",
     class: 5,
     roll: 4,
-    name: "মোছা:তাবাচ্ছুম চৌধুরী রুহি",
+    name: "মোছাঃতাবাচ্ছুম চৌধুরী রুহি",
     fatherName: "আবদুল অদুদ চৌধুরী",
     motherName: "সেলিনা আকতার",
     results: [
@@ -2135,10 +2143,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 52, continuous: 26 },
           { subjectName: "ইংরেজি", terminal: 61, continuous: 27 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 67, continuous: 28 },
-          { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
-          { subjectName: "সংগীত", terminal: 45, continuous: 0 },
+          { subjectName: "charukola", terminal: 45, continuous: 0 },
+          { subjectName: "karukola", terminal: 45, continuous: 0 },
+          { subjectName: "sharirik shikkha", terminal: 45, continuous: 0 },
+          { subjectName: "shongit", terminal: 45, continuous: 0 },
         ],
       },
       {
@@ -2406,7 +2414,7 @@ export const students: Student[] = [
     roll: 22,
     name: "ফরহাদুল ইসলাম",
     fatherName: "মোহাম্মদ ফারুক",
-    motherName: "রিফা আকতার",
+    motherName: "রিফা আক্তার",
     results: [
       {
         examType: "দ্বিতীয় প্রান্তিক",
@@ -2573,3 +2581,4 @@ export const subjects_c1_2 = [
   "চারু ও কারুকলা",
   "সংগীত",
 ];
+
