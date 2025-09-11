@@ -27,22 +27,25 @@ export default function LoginPage() {
   const handleLogin = () => {
     setLoading(true);
 
-    if (username === teacherCredentials.username && password === teacherCredentials.password) {
-      localStorage.setItem('userRole', 'teacher');
-      toast({ title: 'শিক্ষক হিসেবে লগইন সফল হয়েছে!' });
-      router.push('/teacher/dashboard');
-    } else if (username === studentCredentials.username && password === studentCredentials.password) {
-      localStorage.setItem('userRole', 'student');
-      toast({ title: 'শিক্ষার্থী হিসেবে লগইন সফল হয়েছে!' });
-      router.push('/student/home');
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'লগইন ব্যর্থ',
-        description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
-      });
-      setLoading(false);
-    }
+    // Using a timeout to give feedback to the user that something is happening.
+    setTimeout(() => {
+        if (username === teacherCredentials.username && password === teacherCredentials.password) {
+            localStorage.setItem('userRole', 'teacher');
+            toast({ title: 'শিক্ষক হিসেবে লগইন সফল হয়েছে!' });
+            router.push('/teacher/dashboard');
+        } else if (username === studentCredentials.username && password === studentCredentials.password) {
+            localStorage.setItem('userRole', 'student');
+            toast({ title: 'শিক্ষার্থী হিসেবে লগইন সফল হয়েছে!' });
+            router.push('/student/home');
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'লগইন ব্যর্থ',
+                description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            });
+            setLoading(false);
+        }
+    }, 1000);
   };
 
   return (
@@ -73,6 +76,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             />
           </div>
           <div className="space-y-2">
@@ -84,6 +88,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             />
           </div>
         </CardContent>
