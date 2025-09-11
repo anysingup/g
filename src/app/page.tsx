@@ -37,7 +37,6 @@ import { students } from "@/lib/results-data";
 import { NoticeBoard } from "@/components/notice-board";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClassmateAi } from "@/components/classmate-ai";
-import Link from 'next/link';
 
 const FormSchema = z.object({
   academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
@@ -206,11 +205,10 @@ export default function Home() {
 
       <main className="w-full max-w-4xl">
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="results">ফলাফল দেখুন</TabsTrigger>
             <TabsTrigger value="notices">বিদ্যালয়ের নোটিশ</TabsTrigger>
             <TabsTrigger value="ai-assistant">সহপাঠী AI</TabsTrigger>
-            <TabsTrigger value="language-learn">ভাষা শিখুন</TabsTrigger>
           </TabsList>
           <TabsContent value="results">
             <Card className="shadow-lg mt-4">
@@ -369,24 +367,6 @@ export default function Home() {
           <TabsContent value="ai-assistant">
             <ClassmateAi />
           </TabsContent>
-           <TabsContent value="language-learn">
-              <Card className="shadow-lg mt-4 w-full">
-                 <CardHeader className="text-center bg-primary/10 rounded-t-lg">
-                    <CardTitle className="text-2xl text-primary font-bold">
-                       ইংরেজি শিখুন
-                    </CardTitle>
-                    <CardDescription>
-                       আপনার ইংরেজি শেখার যাত্রা শুরু করুন।
-                    </CardDescription>
-                 </CardHeader>
-                 <CardContent className="p-6 text-center">
-                    <p className="mb-4">আমাদের নতুন ভাষা শেখার মডিউল ব্যবহার করে আপনার ইংরেজি দক্ষতা বৃদ্ধি করুন।</p>
-                    <Button asChild>
-                       <Link href="/learn">শুরু করুন</Link>
-                    </Button>
-                 </CardContent>
-              </Card>
-           </TabsContent>
         </Tabs>
       </main>
 
