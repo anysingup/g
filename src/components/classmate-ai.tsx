@@ -144,15 +144,16 @@ export function ClassmateAi() {
             {conversation.map((msg, index) => (
               <div
                 key={index}
-                className={`flex items-end gap-2 ${
+                className={`flex items-end gap-2.5 ${
                   msg.sender === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
+                {msg.sender === 'ai' && <Bot className="h-8 w-8 text-primary self-start shrink-0" />}
                 <div
-                  className={`max-w-md rounded-lg p-3 ${
+                  className={`max-w-xl rounded-lg p-3 ${
                     msg.sender === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                      ? 'bg-primary text-primary-foreground rounded-br-none'
+                      : 'bg-muted rounded-bl-none'
                   }`}
                 >
                    {msg.image && (
@@ -171,15 +172,16 @@ export function ClassmateAi() {
             ))}
             {loading && (
               <div className="flex items-end gap-2 justify-start">
-                <div className="max-w-md rounded-lg p-3 bg-muted">
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                 <Bot className="h-8 w-8 text-primary self-start" />
+                <div className="max-w-md rounded-lg p-3 bg-muted rounded-bl-none">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               </div>
             )}
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="p-4 border-t">
+      <CardFooter className="flex-col items-center p-4 border-t gap-3">
         <form onSubmit={handleSubmit} className="w-full space-y-3">
           {imagePreview && (
             <div className="relative w-32 h-32">
@@ -232,6 +234,7 @@ export function ClassmateAi() {
           </Button>
           </div>
         </form>
+         <p className="text-xs text-muted-foreground mt-2">Make by Omar Faruque (Afif)</p>
       </CardFooter>
     </Card>
   );
