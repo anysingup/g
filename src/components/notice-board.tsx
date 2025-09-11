@@ -56,7 +56,7 @@ export const NoticeBoard = () => {
   );
 
   return (
-    <Card className="shadow-lg mt-8">
+    <Card className="shadow-lg mt-4">
       <CardHeader className="text-center bg-primary/10 rounded-t-lg">
         <CardTitle className="text-2xl text-primary font-bold flex items-center justify-center gap-2">
           <BellRing className="h-7 w-7 text-primary" />

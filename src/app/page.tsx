@@ -34,8 +34,9 @@ import { Loader2, Search, Trophy } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { students } from "@/lib/results-data";
-import type { Student, ExamResult } from "@/lib/types";
 import { NoticeBoard } from "@/components/notice-board";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClassmateAi } from "@/components/classmate-ai";
 
 const FormSchema = z.object({
   academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
@@ -203,152 +204,170 @@ export default function Home() {
       </header>
 
       <main className="w-full max-w-4xl">
-        <Card className="shadow-lg">
-          <CardHeader className="text-center bg-primary/10 rounded-t-lg">
-            <CardTitle className="text-2xl text-primary font-bold">
-              ফলাফল অনুসন্ধান করুন
-            </CardTitle>
-            <CardDescription>
-              আপনার শিক্ষার্থীর পরীক্ষার ফলাফল দেখতে নিচের তথ্যগুলো পূরণ করুন।
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                  <FormField
-                    control={form.control}
-                    name="academicYear"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>শিক্ষাবর্ষ</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="শিক্ষাবর্ষ" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="2025">২০২৫</SelectItem>
-                            <SelectItem value="2026">২০২৬</SelectItem>
-                            <SelectItem value="2027">২০২৭</SelectItem>
-                            <SelectItem value="2028">২০২৮</SelectItem>
-                            <SelectItem value="2029">২০২৯</SelectItem>
-                            <SelectItem value="2030">২০৩০</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="class"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>শ্রেণি</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="একটি শ্রেণী নির্বাচন করুন" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="1">প্রথম শ্রেণী</SelectItem>
-                            <SelectItem value="2">দ্বিতীয় শ্রেণী</SelectItem>
-                            <SelectItem value="3">তৃতীয় শ্রেণী</SelectItem>
-                            <SelectItem value="4">চতুর্থ শ্রেণী</SelectItem>
-                            <SelectItem value="5">পঞ্চম শ্রেণী</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="examType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>পরীক্ষা</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="একটি পরীক্ষার ধরন নির্বাচন করুন" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="প্রথম প্রান্তিক">
-                              প্রথম প্রান্তিক
-                            </SelectItem>
-                            <SelectItem value="দ্বিতীয় প্রান্তিক">
-                              দ্বিতীয় প্রান্তিক
-                            </SelectItem>
-                            <SelectItem value="বার্ষিক">বার্ষিক</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="rollNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>রোল নম্বর</FormLabel>
-                        <FormControl>
-                          <Input placeholder="আপনার রোল নম্বর" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>ত্রুটি</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                <div className="flex justify-center pt-2">
-                  <Button
-                    type="submit"
-                    className="w-full max-w-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full shadow-lg"
-                    disabled={loading}
+        <Tabs defaultValue="results" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="results">ফলাফল দেখুন</TabsTrigger>
+            <TabsTrigger value="notices">বিদ্যালয়ের নোটিশ</TabsTrigger>
+            <TabsTrigger value="ai-assistant">সহপাঠী AI</TabsTrigger>
+          </TabsList>
+          <TabsContent value="results">
+            <Card className="shadow-lg mt-4">
+              <CardHeader className="text-center bg-primary/10 rounded-t-lg">
+                <CardTitle className="text-2xl text-primary font-bold">
+                  ফলাফল অনুসন্ধান করুন
+                </CardTitle>
+                <CardDescription>
+                  আপনার শিক্ষার্থীর পরীক্ষার ফলাফল দেখতে নিচের তথ্যগুলো পূরণ
+                  করুন।
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
                   >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        অনুসন্ধান করা হচ্ছে...
-                      </>
-                    ) : (
-                      <>
-                        <Search className="mr-2 h-4 w-4" />
-                        ফলাফল দেখুন
-                      </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                      <FormField
+                        control={form.control}
+                        name="academicYear"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>শিক্ষাবর্ষ</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="শিক্ষাবর্ষ" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="2025">২০২৫</SelectItem>
+                                <SelectItem value="2026">২০২৬</SelectItem>
+                                <SelectItem value="2027">২০২৭</SelectItem>
+                                <SelectItem value="2028">২০২৮</SelectItem>
+                                <SelectItem value="2029">২০২৯</SelectItem>
+                                <SelectItem value="2030">২০৩০</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="class"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>শ্রেণি</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="একটি শ্রেণী নির্বাচন করুন" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="1">প্রথম শ্রেণী</SelectItem>
+                                <SelectItem value="2">দ্বিতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="3">তৃতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="4">চতুর্থ শ্রেণী</SelectItem>
+                                <SelectItem value="5">পঞ্চম শ্রেণী</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="examType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>পরীক্ষা</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="একটি পরীক্ষার ধরন নির্বাচন করুন" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="প্রথম প্রান্তিক">
+                                  প্রথম প্রান্তিক
+                                </SelectItem>
+                                <SelectItem value="দ্বিতীয় প্রান্তিক">
+                                  দ্বিতীয় প্রান্তিক
+                                </SelectItem>
+                                <SelectItem value="বার্ষিক">বার্ষিক</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="rollNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>রোল নম্বর</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="আপনার রোল নম্বর"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>ত্রুটি</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
                     )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-        <ToppersList />
-        <NoticeBoard />
+                    <div className="flex justify-center pt-2">
+                      <Button
+                        type="submit"
+                        className="w-full max-w-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full shadow-lg"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            অনুসন্ধান করা হচ্ছে...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="mr-2 h-4 w-4" />
+                            ফলাফল দেখুন
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+            <ToppersList />
+          </TabsContent>
+          <TabsContent value="notices">
+            <NoticeBoard />
+          </TabsContent>
+          <TabsContent value="ai-assistant">
+            <ClassmateAi />
+          </TabsContent>
+        </Tabs>
       </main>
 
       <MultilingualSupport />
