@@ -98,7 +98,8 @@ export function ClassmateAi() {
     if ((!query.trim() && !imageFile) || loading) return;
 
     const userMessage: Message = { sender: 'user', text: query, image: imagePreview || undefined };
-    setConversation(prev => [...prev, userMessage]);
+    const newConversation = [...conversation, userMessage];
+    setConversation(newConversation);
     
     setLoading(true);
 
@@ -108,7 +109,13 @@ export function ClassmateAi() {
             photoDataUri = await toBase64(imageFile);
         }
 
-      const result = await getClassmateResponse({ query: query, photoDataUri });
+      const conversationHistoryForApi = newConversation.slice(0, -1).map(msg => ({ sender: msg.sender, text: msg.text }));
+
+      const result = await getClassmateResponse({ 
+          query: query, 
+          photoDataUri,
+          conversationHistory: conversationHistoryForApi,
+      });
       
       const aiMessage: Message = { 
         sender: 'ai', 

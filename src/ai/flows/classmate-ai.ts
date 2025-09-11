@@ -14,6 +14,10 @@ import { generateImage } from './image-generation-flow';
 
 const ClassmateAiInputSchema = z.object({
   query: z.string().describe('The student’s question or problem.'),
+  conversationHistory: z.array(z.object({
+    sender: z.string(),
+    text: z.string(),
+  })).optional().describe('The history of the conversation so far.'),
   photoDataUri: z
     .string()
     .optional()
@@ -56,6 +60,52 @@ const imageGenClassifierPrompt = ai.definePrompt({
     `,
 });
 
+const languageLearningClassifierPrompt = ai.definePrompt({
+    name: 'languageLearningClassifierPrompt',
+    input: { schema: z.object({ query: z.string() }) },
+    output: { schema: z.object({ wantsToLearn: z.boolean() }) },
+    prompt: `You are a text classifier. Your task is to determine if the user wants to learn English.
+    The user is a primary school student or teacher in Bangladesh.
+    Keywords to look for: "শিখব" (learn), "শিখতে চাই" (want to learn), "ইংলিশ" (English), "ইংরেজি", "English".
+    
+    Examples:
+    - "আমি ইংরেজি শিখব" -> wantsToLearn: true
+    - "গণিত সমস্যাটি সমাধান কর" -> wantsToLearn: false
+    - "I want to learn English" -> wantsToLearn: true
+    - "How are you?" -> wantsToLearn: false
+    - "আমাকে ইংরেজি শেখাও" -> wantsToLearn: true
+
+    User Query: "{{query}}"
+    `,
+});
+
+const englishTutorPrompt = ai.definePrompt({
+  name: 'englishTutorPrompt',
+  input: {schema: ClassmateAiInputSchema},
+  output: {schema: ClassmateAiOutputSchema},
+  prompt: `You are "Sahapathi AI" (Classmate AI), but you are now in a special role as a friendly and patient English Language Tutor.
+Your student is from Bangladesh (can be a child or an adult teacher) and wants to learn English.
+You must always respond in a mix of simple Bengali and English to make them comfortable.
+
+Your task is to guide the student through learning English, from basic to advanced levels.
+1.  **Assess their level:** If the conversation is new, start by asking about their current English level. Say something like, "Of course! আমি তোমাকে ইংরেজি শিখতে সাহায্য করতে পারি। তুমি ইংরেজি কেমন পারো? Basic, Intermediate, নাকি Advanced?"
+2.  **Start the lesson:** Based on their answer, or if they just want to start, begin with a very basic lesson. For example, "চলো, তাহলে শুরু করা যাক! Let's start with some simple greetings. 'Hello' মানে 'ওহে'। তুমি কি কাউকে 'Hello' বলতে পারবে?"
+3.  **Be conversational:** Maintain a conversation. Use the provided conversation history to understand the context and continue the lesson from where you left off. Ask questions, give small quizzes, and provide encouragement.
+4.  **Keep it simple:** Use simple language. Explain one concept at a time.
+5.  **Encourage practice:** After explaining something, ask the user to try it themselves. For example, "Now, you try! 'আমার নাম [Your Name]' - এটাকে ইংরেজিতে কীভাবে বলবে?"
+
+Conversation History:
+{{#each conversationHistory}}
+- {{sender}}: {{text}}
+{{/each}}
+
+Student's new message: "{{query}}"
+
+Your encouraging and helpful tutor response:
+`,
+});
+
+
 const classmateAiPrompt = ai.definePrompt({
   name: 'classmateAiPrompt',
   input: {schema: ClassmateAiInputSchema},
@@ -90,11 +140,9 @@ const classmateAiFlow = ai.defineFlow(
   },
   async input => {
     try {
-        // 1. Classify the user's intent
-        const { output: classification } = await imageGenClassifierPrompt({query: input.query});
+        const { output: imageClassification } = await imageGenClassifierPrompt({query: input.query});
 
-        // 2. If it's an image generation request, call the image generation flow
-        if (classification?.shouldGenerate) {
+        if (imageClassification?.shouldGenerate) {
             try {
                 const imageResult = await generateImage(input.query);
                 return {
@@ -108,12 +156,18 @@ const classmateAiFlow = ai.defineFlow(
                 };
             }
         }
+
+        const { output: learningClassification } = await languageLearningClassifierPrompt({query: input.query});
+
+        if(learningClassification?.wantsToLearn) {
+             const {output} = await englishTutorPrompt(input);
+             return output!;
+        }
+
     } catch (error) {
-        console.error('Classification for image generation failed. Falling back to text generation.', error);
-        // Fallback to text generation if classification fails for any reason (e.g. model overload)
+        console.error('Classification failed. Falling back to text generation.', error);
     }
 
-    // 3. Otherwise, or on fallback, get a text-based response
     const {output} = await classmateAiPrompt(input);
     return output!;
   }
