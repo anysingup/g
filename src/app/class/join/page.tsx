@@ -44,6 +44,10 @@ export default function JoinClassPage() {
         if (snapshot.exists()) {
           const storedPassword = snapshot.val();
           if (storedPassword === password) {
+             toast({
+              title: 'সফল',
+              description: 'ক্লাসে যোগ দিচ্ছেন...',
+            });
             router.push(`/class/${classId}`);
           } else {
             toast({
@@ -57,7 +61,7 @@ export default function JoinClassPage() {
           toast({
             variant: 'destructive',
             title: 'প্রবেশ করতে ব্যর্থ',
-            description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            description: 'ক্লাসটি খুঁজে পাওয়া যায়নি। আইডি সঠিক কিনা তা পরীক্ষা করুন।',
           });
           setLoading(false);
         }

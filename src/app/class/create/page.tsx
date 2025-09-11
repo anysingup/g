@@ -57,8 +57,11 @@ export default function CreateClassPage() {
     const classRef = ref(database, `classes/${classId}/password`);
     set(classRef, password)
       .then(() => {
+        toast({
+          title: 'সফল',
+          description: 'ক্লাস সফলভাবে তৈরি হয়েছে।',
+        });
         router.push(`/class/${classId}`);
-        // No need to set loading to false here, as the page is navigating away.
       })
       .catch((error) => {
         console.error("Failed to create class:", error);
