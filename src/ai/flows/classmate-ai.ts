@@ -89,26 +89,31 @@ const classmateAiFlow = ai.defineFlow(
     outputSchema: ClassmateAiOutputSchema,
   },
   async input => {
-    // 1. Classify the user's intent
-    const { output: classification } = await imageGenClassifierPrompt({query: input.query});
+    try {
+        // 1. Classify the user's intent
+        const { output: classification } = await imageGenClassifierPrompt({query: input.query});
 
-    // 2. If it's an image generation request, call the image generation flow
-    if (classification?.shouldGenerate) {
-        try {
-            const imageResult = await generateImage(input.query);
-            return {
-                response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
-                generatedImage: imageResult.imageDataUri,
-            };
-        } catch (error) {
-            console.error('Image generation failed:', error);
-            return {
-                response: 'দুঃখিত, আমি ছবিটি তৈরি করতে পারিনি। অন্য কিছু চেষ্টা করে দেখবে?',
-            };
+        // 2. If it's an image generation request, call the image generation flow
+        if (classification?.shouldGenerate) {
+            try {
+                const imageResult = await generateImage(input.query);
+                return {
+                    response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
+                    generatedImage: imageResult.imageDataUri,
+                };
+            } catch (error) {
+                console.error('Image generation failed:', error);
+                return {
+                    response: 'দুঃখিত, আমি ছবিটি তৈরি করতে পারিনি। অন্য কিছু চেষ্টা করে দেখবে?',
+                };
+            }
         }
+    } catch (error) {
+        console.error('Classification for image generation failed. Falling back to text generation.', error);
+        // Fallback to text generation if classification fails for any reason (e.g. model overload)
     }
 
-    // 3. Otherwise, get a text-based response
+    // 3. Otherwise, or on fallback, get a text-based response
     const {output} = await classmateAiPrompt(input);
     return output!;
   }
