@@ -69,8 +69,8 @@ export default function CreateClassPage() {
         title: 'ক্লাস তৈরি করতে ব্যর্থ',
         description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
       });
-      setLoading(false); // Make sure to stop loading on error
-    } 
+      setLoading(false);
+    }
   };
 
   const copyToClipboard = (text: string) => {
