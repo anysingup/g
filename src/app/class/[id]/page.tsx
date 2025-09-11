@@ -37,7 +37,7 @@ function VideoCall() {
   const [loading, setLoading] = useState(true);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
-  const cleanUp = () => {
+  const cleanUp = (isLeaving: boolean = false) => {
     if (localStream) {
       localStream.getTracks().forEach(track => track.stop());
     }
@@ -46,13 +46,19 @@ function VideoCall() {
     
     if (classId && userId) {
         const userRef = ref(database, `classes/${classId}/users/${userId}`);
-        remove(userRef);
-        goOffline(database);
+        const signalsRef = ref(database, `classes/${classId}/signals/${userId}`);
+        
+        // This will only run if the user is leaving the page, not on component unmount cleanup
+        if (isLeaving) {
+             remove(userRef);
+             remove(signalsRef);
+             goOffline(database);
+        }
     }
   };
 
   const leaveCall = () => {
-    cleanUp();
+    cleanUp(true);
     window.location.href = '/';
   };
   
@@ -81,11 +87,12 @@ function VideoCall() {
     };
     setup();
 
-    window.addEventListener('beforeunload', cleanUp);
+    const beforeUnloadHandler = () => cleanUp(true);
+    window.addEventListener('beforeunload', beforeUnloadHandler);
 
     return () => {
-      window.removeEventListener('beforeunload', cleanUp);
-      cleanUp();
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
+      cleanUp(true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -99,19 +106,18 @@ function VideoCall() {
     const userRef = ref(database, `classes/${classId}/users/${userId}`);
     const allUsersRef = ref(database, `classes/${classId}/users`);
 
-    const connectedRef = ref(database, '.info/connected');
-    const presenceListener = onValue(connectedRef, (snap) => {
+    onValue(ref(database, '.info/connected'), (snap) => {
         if (snap.val() === true) {
             set(userRef, { isOnline: true });
             onDisconnect(userRef).remove();
         }
     });
 
-    const createPeerConnection = (peerId: string, isInitiator: boolean) => {
-        if (peerConnections.current[peerId]) {
-            return peerConnections.current[peerId];
+    const createPeerConnection = (peerId: string) => {
+        if (peerConnections.current[peerId] || peerId === userId) {
+            return;
         }
-    
+        
         const pc = new RTCPeerConnection(ICE_SERVERS);
         peerConnections.current[peerId] = pc;
     
@@ -120,61 +126,18 @@ function VideoCall() {
         pc.ontrack = (event) => {
             setRemoteStreams(prev => ({ ...prev, [peerId]: event.streams[0] }));
         };
-    
-        const signalsRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}`);
-        const remoteSignalsRef = ref(database, `classes/${classId}/signals/${peerId}/${userId}`);
 
+        const signalRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}`);
+        onDisconnect(signalRef).remove();
+        
         pc.onicecandidate = (event) => {
             if (event.candidate) {
-                set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/iceCandidates/${event.candidate.sdpMid}_${event.candidate.sdpMLineIndex}`), event.candidate.toJSON());
+                const candidateRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}/iceCandidates`);
+                set(candidateRef, [ ...((peerConnections.current[peerId] as any).candidates || []), event.candidate.toJSON()]);
+                (peerConnections.current[peerId] as any).candidates = [...((peerConnections.current[peerId] as any).candidates || []), event.candidate.toJSON()];
             }
         };
 
-        if (isInitiator) {
-            pc.onnegotiationneeded = async () => {
-                try {
-                    const offer = await pc.createOffer();
-                    await pc.setLocalDescription(offer);
-                    set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), pc.localDescription);
-                } catch (e) {
-                    console.error("Error creating offer:", e);
-                }
-            };
-        }
-
-        const signalListener = onValue(remoteSignalsRef, async (signalSnap) => {
-            const signal = signalSnap.val();
-            if (!signal || !pc) return;
-
-            try {
-                if (signal.sdp && pc.currentRemoteDescription?.type !== signal.sdp.type) {
-                    await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-                    if (signal.sdp.type === 'offer') {
-                        const answer = await pc.createAnswer();
-                        await pc.setLocalDescription(answer);
-                        set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), pc.localDescription);
-                    }
-                }
-
-                if (signal.iceCandidates) {
-                    Object.values(signal.iceCandidates).forEach(async (candidate: any) => {
-                        try {
-                            if(pc.currentRemoteDescription) { // Only add candidates after remote description is set
-                                await pc.addIceCandidate(new RTCIceCandidate(candidate));
-                            }
-                        } catch (e) {
-                            if (!e.toString().includes("OperationError: Failed to add ICE candidate")) {
-                                console.error("Error adding received ICE candidate:", e);
-                            }
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error("Error handling signal: ", e);
-            }
-        });
-        
-        onDisconnect(signalsRef).remove();
         return pc;
     };
     
@@ -185,9 +148,7 @@ function VideoCall() {
         // Handle new users
         for (const peerId of allUserIds) {
             if (peerId !== userId && !peerConnections.current[peerId]) {
-                 // The user with the lexicographically smaller ID initiates the connection
-                const isInitiator = userId < peerId;
-                createPeerConnection(peerId, isInitiator);
+                 createPeerConnection(peerId);
             }
         }
     
@@ -201,18 +162,70 @@ function VideoCall() {
                     delete newStreams[peerId];
                     return newStreams;
                 });
-                remove(ref(database, `classes/${classId}/signals/${userId}/${peerId}`));
             }
         }
     });
 
+    const signalsListener = onValue(ref(database, `classes/${classId}/signals`), (snapshot) => {
+        const allSignals = snapshot.val() || {};
+
+        for (const peerId in allSignals) {
+            if(peerId === userId) continue;
+
+            const peerSignals = allSignals[peerId]?.[userId];
+            if(!peerSignals) continue;
+            
+            const pc = peerConnections.current[peerId];
+            if(!pc) continue;
+
+            if (peerSignals.sdp && pc.currentRemoteDescription?.type !== peerSignals.sdp.type) {
+                pc.setRemoteDescription(new RTCSessionDescription(peerSignals.sdp)).then(() => {
+                    if (peerSignals.sdp.type === 'offer') {
+                        pc.createAnswer().then(answer => {
+                            pc.setLocalDescription(answer);
+                            set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), answer);
+                        });
+                    }
+                }).catch(e => console.error("Error setting remote description", e));
+            }
+
+             if (peerSignals.iceCandidates) {
+                peerSignals.iceCandidates.forEach((candidate: any) => {
+                    pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {
+                        if (!e.toString().includes("OperationError: Failed to add ICE candidate")) {
+                             console.error("Error adding received ICE candidate:", e);
+                        }
+                    });
+                });
+            }
+        }
+    });
+
+    const createOffers = () => {
+        for (const peerId in peerConnections.current) {
+            if (userId < peerId) { // Initiator logic
+                const pc = peerConnections.current[peerId];
+                 pc.onnegotiationneeded = async () => {
+                    try {
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), pc.localDescription);
+                    } catch (e) {
+                        console.error("Error creating offer:", e);
+                    }
+                };
+            }
+        }
+    };
+    createOffers();
+
     return () => {
-        presenceListener();
         usersListener();
-        cleanUp();
+        signalsListener();
+        cleanUp(true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localStream, classId, userId]);
+  }, [localStream]);
 
   const toggleMute = () => {
     if (localStream) {
