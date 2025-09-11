@@ -1,10 +1,10 @@
 // In a real application, these should be stored securely in environment variables.
 export const teacherCredentials = {
-  username: 'teacher',
-  password: 'teacherpassword',
+  username: '10191817',
+  password: 'jashimht89',
 };
 
 export const studentCredentials = {
-    username: 'student',
-    password: 'studentpassword',
+    username: '16151413',
+    password: 'student89',
 };
