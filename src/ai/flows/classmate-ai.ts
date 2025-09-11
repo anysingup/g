@@ -68,7 +68,7 @@ const classmateAiFlow = ai.defineFlow(
     outputSchema: ClassmateAiOutputSchema,
   },
   async input => {
-    const {output} = await classmateAiFlow(input);
+    const {output} = await classmateAiPrompt(input);
     return output!;
   }
 );
