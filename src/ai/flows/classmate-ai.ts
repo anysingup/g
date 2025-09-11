@@ -95,10 +95,13 @@ const classmateAiFlow = ai.defineFlow(
         const imagePrompt = imageMatch[1];
         try {
             const imageResult = await generateImage(imagePrompt);
-            return {
-                response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
-                generatedImage: imageResult.imageDataUri,
-            };
+            if (imageResult && imageResult.imageDataUri) {
+                return {
+                    response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
+                    generatedImage: imageResult.imageDataUri,
+                };
+            }
+            throw new Error('Image generation result is invalid.');
         } catch (error) {
             console.error('Image generation failed:', error);
             return {
