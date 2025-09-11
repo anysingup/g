@@ -30,14 +30,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MultilingualSupport } from "@/components/multilingual-support";
-import { Loader2, Search, Trophy, Video, PlusCircle } from "lucide-react";
+import { Loader2, Search, Trophy } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { students } from "@/lib/results-data";
 import { NoticeBoard } from "@/components/notice-board";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClassmateAi } from "@/components/classmate-ai";
-import Link from "next/link";
 
 const FormSchema = z.object({
   academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
@@ -206,11 +205,10 @@ export default function Home() {
 
       <main className="w-full max-w-4xl">
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="results">ফলাফল দেখুন</TabsTrigger>
             <TabsTrigger value="notices">বিদ্যালয়ের নোটিশ</TabsTrigger>
             <TabsTrigger value="ai-assistant">সহপাঠী AI</TabsTrigger>
-            <TabsTrigger value="live-class">লাইভ ক্লাস</TabsTrigger>
           </TabsList>
           <TabsContent value="results">
             <Card className="shadow-lg mt-4">
@@ -368,34 +366,6 @@ export default function Home() {
           </TabsContent>
           <TabsContent value="ai-assistant">
             <ClassmateAi />
-          </TabsContent>
-          <TabsContent value="live-class">
-             <Card className="shadow-lg mt-4">
-              <CardHeader className="text-center bg-primary/10 rounded-t-lg">
-                <CardTitle className="text-2xl text-primary font-bold flex items-center justify-center gap-2">
-                  <Video className="h-7 w-7" />
-                  লাইভ ক্লাস
-                </CardTitle>
-                <CardDescription>
-                  লাইভ ক্লাসে যোগ দিন অথবা নতুন ক্লাস তৈরি করুন।
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link href="/class/join">
-                    <Search className="mr-2 h-4 w-4" />
-                    ক্লাসে যোগ দিন
-                  </Link>
-                </Button>
-                <div className='text-muted-foreground'>অথবা</div>
-                <Button asChild variant="outline" className="w-full sm:w-auto">
-                   <Link href="/class/create">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    নতুন ক্লাস তৈরি করুন (শিক্ষক)
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </main>
