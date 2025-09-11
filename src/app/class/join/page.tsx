@@ -14,16 +14,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, LogIn } from 'lucide-react';
+import { ArrowLeft, LogIn, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { database } from '@/lib/firebase';
+import { ref, get } from 'firebase/database';
 
 export default function JoinClassPage() {
   const [classId, setClassId] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleJoinClass = () => {
+  const handleJoinClass = async () => {
     if (!classId.trim() || !password.trim()) {
       toast({
         variant: 'destructive',
@@ -32,7 +35,42 @@ export default function JoinClassPage() {
       });
       return;
     }
-    router.push(`/class/${classId}?password=${encodeURIComponent(password)}`);
+    
+    setLoading(true);
+
+    try {
+      const classRef = ref(database, `classes/${classId}/password`);
+      const snapshot = await get(classRef);
+
+      if (snapshot.exists()) {
+        const storedPassword = snapshot.val();
+        if (storedPassword === password) {
+          router.push(`/class/${classId}`);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'প্রবেশ করতে ব্যর্থ',
+            description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          });
+          setLoading(false);
+        }
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'প্রবেশ করতে ব্যর্থ',
+          description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+        });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Failed to join class:", error);
+      toast({
+        variant: 'destructive',
+        title: 'যোগ দিতে ব্যর্থ',
+        description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,6 +100,7 @@ export default function JoinClassPage() {
               placeholder="ক্লাস আইডি লিখুন"
               value={classId}
               onChange={(e) => setClassId(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -72,13 +111,23 @@ export default function JoinClassPage() {
               placeholder="পাসওয়ার্ড দিন"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleJoinClass} className="w-full bg-primary hover:bg-primary/90">
-            <LogIn className="mr-2 h-4 w-4" />
-            প্রবেশ করুন
+          <Button onClick={handleJoinClass} className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+             {loading ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    প্রবেশ করা হচ্ছে...
+                </>
+             ) : (
+                <>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    প্রবেশ করুন
+                </>
+             )}
           </Button>
         </CardFooter>
       </Card>

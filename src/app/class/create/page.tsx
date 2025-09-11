@@ -14,12 +14,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Copy, Video } from 'lucide-react';
+import { ArrowLeft, Copy, Video, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { database } from '@/lib/firebase';
+import { ref, set } from 'firebase/database';
 
 export default function CreateClassPage() {
   const [classId, setClassId] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -29,7 +32,7 @@ export default function CreateClassPage() {
     setClassId(newClassId);
   }, []);
 
-  const handleCreateClass = () => {
+  const handleCreateClass = async () => {
     if (!password.trim()) {
       toast({
         variant: 'destructive',
@@ -38,7 +41,26 @@ export default function CreateClassPage() {
       });
       return;
     }
-    router.push(`/class/${classId}?password=${encodeURIComponent(password)}`);
+
+    setLoading(true);
+
+    try {
+      // Save the password in Firebase
+      const classRef = ref(database, `classes/${classId}/password`);
+      await set(classRef, password);
+
+      // Redirect to the class page
+      router.push(`/class/${classId}`);
+
+    } catch (error) {
+      console.error("Failed to create class:", error);
+      toast({
+        variant: 'destructive',
+        title: 'ক্লাস তৈরি করতে ব্যর্থ',
+        description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+      });
+      setLoading(false);
+    }
   };
 
   const copyToClipboard = (text: string) => {
@@ -86,13 +108,23 @@ export default function CreateClassPage() {
               placeholder="একটি পাসওয়ার্ড দিন"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleCreateClass} className="w-full bg-primary hover:bg-primary/90">
-            <Video className="mr-2 h-4 w-4" />
-            ক্লাস শুরু করুন
+          <Button onClick={handleCreateClass} className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+            {loading ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ক্লাস তৈরি হচ্ছে...
+                </>
+            ) : (
+                <>
+                    <Video className="mr-2 h-4 w-4" />
+                    ক্লাস শুরু করুন
+                </>
+            )}
           </Button>
         </CardFooter>
       </Card>
