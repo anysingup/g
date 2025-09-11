@@ -34,11 +34,13 @@ export function ClassmateAi() {
       }
     } catch (error) {
       console.error("Failed to parse conversation from localStorage", error);
+      // If parsing fails, clear the corrupted data
+      localStorage.removeItem('classmate-ai-conversation');
     }
   }, []);
 
   useEffect(() => {
-    if (conversation.length) {
+    if (conversation.length > 0) {
       localStorage.setItem('classmate-ai-conversation', JSON.stringify(conversation));
     }
     if (scrollAreaRef.current) {
