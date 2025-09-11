@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,20 +12,36 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Bot } from 'lucide-react';
+import { Loader2, Bot, Paperclip, XCircle } from 'lucide-react';
 import { getClassmateResponse } from '@/ai/flows/classmate-ai';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from './ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 type Message = {
   sender: 'user' | 'ai';
   text: string;
+  image?: string;
 };
+
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+  });
 
 export function ClassmateAi() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversation, setConversation] = useState<Message[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     try {
@@ -34,7 +51,6 @@ export function ClassmateAi() {
       }
     } catch (error) {
       console.error("Failed to parse conversation from localStorage", error);
-      // If parsing fails, clear the corrupted data
       localStorage.removeItem('classmate-ai-conversation');
     }
   }, []);
@@ -51,17 +67,47 @@ export function ClassmateAi() {
     }
   }, [conversation]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 4 * 1024 * 1024) { // 4MB limit
+        toast({
+            variant: 'destructive',
+            title: 'ত্রুটি',
+            description: 'ছবির সাইজ ৪ মেগাবাইটের বেশি হতে পারবে না।',
+        });
+        return;
+      }
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || loading) return;
+    if ((!query.trim() && !imageFile) || loading) return;
 
-    const userMessage: Message = { sender: 'user', text: query };
+    const userMessage: Message = { sender: 'user', text: query, image: imagePreview || undefined };
     setConversation(prev => [...prev, userMessage]);
-    setQuery('');
+    
     setLoading(true);
 
     try {
-      const result = await getClassmateResponse({ query: userMessage.text });
+        let photoDataUri: string | undefined = undefined;
+        if (imageFile) {
+            photoDataUri = await toBase64(imageFile);
+        }
+
+      const result = await getClassmateResponse({ query: query, photoDataUri });
       if (result.response) {
         const aiMessage: Message = { sender: 'ai', text: result.response };
         setConversation(prev => [...prev, aiMessage]);
@@ -77,6 +123,8 @@ export function ClassmateAi() {
       setConversation(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
+      setQuery('');
+      removeImage();
     }
   };
 
@@ -88,7 +136,7 @@ export function ClassmateAi() {
           সহপাঠী AI
         </CardTitle>
         <CardDescription>
-          তোমার পড়াশোনার যেকোনো প্রশ্ন আমাকে করতে পারো।
+          তোমার পড়াশোনার যেকোনো প্রশ্ন আমাকে করতে পারো, এমনকি ছবি তুলেও।
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
@@ -108,6 +156,11 @@ export function ClassmateAi() {
                       : 'bg-muted'
                   }`}
                 >
+                   {msg.image && (
+                      <div className="mb-2">
+                        <Image src={msg.image} alt="User upload" width={200} height={150} className="rounded-md" />
+                      </div>
+                    )}
                   <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                 </div>
               </div>
@@ -122,23 +175,48 @@ export function ClassmateAi() {
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="p-6 border-t">
-        <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
-          <Textarea
-            id="query"
-            placeholder="এখানে তোমার প্রশ্ন লেখো..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            disabled={loading}
-            className="flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e as any);
-              }
-            }}
-          />
-          <Button type="submit" disabled={loading || !query.trim()}>
+      <CardFooter className="p-4 border-t">
+        <form onSubmit={handleSubmit} className="w-full space-y-3">
+          {imagePreview && (
+            <div className="relative w-32 h-32">
+              <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" className="rounded-md" />
+              <Button variant="ghost" size="icon" className="absolute top-0 right-0 bg-black/50 hover:bg-black/75 text-white h-6 w-6" onClick={removeImage}>
+                <XCircle className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          <div className="flex w-full items-start space-x-2">
+            <Textarea
+              id="query"
+              placeholder="এখানে তোমার প্রশ্ন লেখো..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              disabled={loading}
+              className="flex-1"
+              rows={1}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e as any);
+                }
+              }}
+            />
+             <Button asChild variant="ghost" size="icon" className='shrink-0' disabled={loading}>
+                <Label htmlFor="image-upload" className='cursor-pointer'>
+                    <Paperclip className='h-5 w-5' />
+                    <span className="sr-only">ছবি যোগ করুন</span>
+                </Label>
+             </Button>
+             <input
+                id="image-upload"
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/png, image/jpeg, image/webp"
+                onChange={handleImageChange}
+                disabled={loading}
+             />
+          <Button type="submit" disabled={loading || (!query.trim() && !imageFile)}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -148,6 +226,7 @@ export function ClassmateAi() {
               'পাঠাও'
             )}
           </Button>
+          </div>
         </form>
       </CardFooter>
     </Card>

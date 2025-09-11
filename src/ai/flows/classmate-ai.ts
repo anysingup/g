@@ -13,6 +13,12 @@ import {z} from 'genkit';
 
 const ClassmateAiInputSchema = z.object({
   query: z.string().describe('The student’s question or problem.'),
+  photoDataUri: z
+    .string()
+    .optional()
+    .describe(
+      "An optional photo of the student's problem (e.g., a math equation), as a data URI."
+    ),
 });
 export type ClassmateAiInput = z.infer<typeof ClassmateAiInputSchema>;
 
@@ -37,10 +43,16 @@ const classmateAiPrompt = ai.definePrompt({
 Your personality is like a knowledgeable and patient older sibling or a very smart classmate.
 You must always respond in Bengali.
 When a student asks you a question, you should provide a clear, simple, and accurate answer.
-If it's a math problem, explain the steps to solve it.
-If it's an English question (like translation or grammar), explain the concept clearly.
+If a photo is provided, analyze the photo first as it contains the primary question. The text query will provide additional context.
+If it's a math problem (from text or photo), explain the steps to solve it.
+If it's an English question (like translation or grammar, from text or photo), explain the concept clearly.
 For general knowledge, provide concise and easy-to-understand information.
 Always be encouraging and maintain a positive tone.
+
+{{#if photoDataUri}}
+Photo of the problem:
+{{media url=photoDataUri}}
+{{/if}}
 
 Student's Query:
 "{{query}}"
@@ -56,7 +68,7 @@ const classmateAiFlow = ai.defineFlow(
     outputSchema: ClassmateAiOutputSchema,
   },
   async input => {
-    const {output} = await classmateAiPrompt(input);
+    const {output} = await classmateAiFlow(input);
     return output!;
   }
 );
