@@ -44,12 +44,12 @@ export default function CreateClassPage() {
     }
 
     if (!classId) {
-        toast({
-            variant: 'destructive',
-            title: 'ত্রুটি',
-            description: 'ক্লাস আইডি তৈরি হয়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।',
-        });
-        return;
+      toast({
+        variant: 'destructive',
+        title: 'ত্রুটি',
+        description: 'ক্লাস আইডি তৈরি হয়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।',
+      });
+      return;
     }
 
     setLoading(true);
@@ -69,7 +69,8 @@ export default function CreateClassPage() {
         title: 'ক্লাস তৈরি করতে ব্যর্থ',
         description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
       });
-      setLoading(false);
+    } finally {
+        setLoading(false);
     }
   };
 
