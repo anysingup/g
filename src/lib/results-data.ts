@@ -1548,7 +1548,7 @@ export const students: Student[] = [
     roll: 6,
     name: "সাদিয়া সোলতানা শিফা",
     fatherName: "মোঃ আবুল হাশেম",
-    motherName: "שেলী আকতার",
+    motherName: "שלי আকতার",
     results: [
       {
         examType: "দ্বিতীয় প্রান্তিক",
@@ -1779,7 +1779,7 @@ export const students: Student[] = [
         examType: "দ্বিতীয় প্রান্তিক",
         subjects: [
           { subjectName: "বাংলা", terminal: 23, continuous: 25 },
-          { subjectName: "গনit", terminal: 30, continuous: 25 },
+          { subjectName: "গনিত", terminal: 30, continuous: 25 },
           { subjectName: "ইংরেজি", terminal: 55, continuous: 25 },
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 27, continuous: 25 },
           { subjectName: "বাংলাদেশ ও বিশ্বপরিচয়", terminal: 25, continuous: 25 },
@@ -2098,7 +2098,7 @@ export const students: Student[] = [
     roll: 8,
     name: "মো: সাহাদাত হোসেন সাহেদ",
     fatherName: "আবুল হাশেম",
-    motherName: "שেলি আকতার",
+    motherName: "שלי আকতার",
     results: [
       {
         examType: "দ্বিতীয় প্রান্তিক",
@@ -2256,10 +2256,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 54, continuous: 20 },
           { subjectName: "ইংরেজি", terminal: 40, continuous: 20 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 20 },
-          { subjectName: "চারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "কারুকলা", terminal: 45, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 45, continuous: 0 },
-          { subjectName: "সংগীত", terminal: 45, continuous: 0 },
+          { subjectName: "charukola", terminal: 45, continuous: 0 },
+          { subjectName: "karukola", terminal: 45, continuous: 0 },
+          { subjectName: "physical education", terminal: 45, continuous: 0 },
+          { subjectName: "music", terminal: 45, continuous: 0 },
         ],
       },
     ],
@@ -2281,10 +2281,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 26, continuous: 12 },
           { subjectName: "ইংরেজি", terminal: 48, continuous: 21 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 25, continuous: 15 },
-          { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
-          { subjectName: "সংগীত", terminal: 40, continuous: 0 },
+          { subjectName: "charukola", terminal: 40, continuous: 0 },
+          { subjectName: "karukola", terminal: 40, continuous: 0 },
+          { subjectName: "physical education", terminal: 40, continuous: 0 },
+          { subjectName: "music", terminal: 40, continuous: 0 },
         ],
       },
     ],
@@ -2306,10 +2306,10 @@ export const students: Student[] = [
           { subjectName: "প্রাথমিক বিজ্ঞান", terminal: 49, continuous: 21 },
           { subjectName: "ইংরেজি", terminal: 39, continuous: 20 },
           { subjectName: "ইসলাম ও নৈতিক শিক্ষা", terminal: 42, continuous: 20 },
-          { subjectName: "চারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "কারুকলা", terminal: 40, continuous: 0 },
-          { subjectName: "শারীরিক শিক্ষা", terminal: 40, continuous: 0 },
-          { subjectName: "সংগীত", terminal: 40, continuous: 0 },
+          { subjectName: "charukola", terminal: 40, continuous: 0 },
+          { subjectName: "karukola", terminal: 40, continuous: 0 },
+          { subjectName: "physical education", terminal: 40, continuous: 0 },
+          { subjectName: "music", terminal: 40, continuous: 0 },
         ],
       },
     ],
@@ -2368,7 +2368,7 @@ export const students: Student[] = [
     id: "c5r18",
     class: 5,
     roll: 18,
-    name: "রোমমান মোহাম্মদ ریহাদ",
+    name: "রোমমান মোহাম্মদ ریحاد",
     fatherName: "মীর মোহাম্মদ",
     motherName: "রকিবা বেগম রকি",
     results: [
@@ -2665,6 +2665,7 @@ export const subjects_c1_2 = [
   "চারু ও কারুকলা",
   "সংগীত",
 ];
+
 
 
 
