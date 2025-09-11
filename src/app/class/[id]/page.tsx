@@ -8,7 +8,7 @@ import { Mic, MicOff, PhoneOff, Video, VideoOff, Loader2, User } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { database } from '@/lib/firebase';
-import { ref, onValue, set, onDisconnect, remove, goOffline, goOnline, get, child } from 'firebase/database';
+import { ref, onValue, set, onDisconnect, remove, goOffline, goOnline, child, get } from 'firebase/database';
 
 // Simple unique ID generator
 const generateUniqueId = () => Math.random().toString(36).substr(2, 9);
@@ -28,18 +28,18 @@ function VideoCall() {
   
   const [userId] = useState(generateUniqueId());
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStreams, setRemoteStreams] = useState<{[key: string]: MediaStream}>({});
-  const peerConnections = useRef<{[key: string]: RTCPeerConnection}>({});
+  const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
+  const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
+  const remoteVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const localVideoRef = useRef<HTMLVideoElement>(null);
 
-  const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [loading, setLoading] = useState(true);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRefs = useRef<{[key: string]: HTMLVideoElement | null}>({});
+  const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
 
-  // Cleanup function to be called on component unmount or leaving call
-  const cleanUp = () => {
+  // Function to clean up all connections and Firebase listeners
+  const cleanup = () => {
     console.log('Cleaning up...');
     if (localStream) {
       localStream.getTracks().forEach(track => track.stop());
@@ -48,18 +48,21 @@ function VideoCall() {
     peerConnections.current = {};
     
     if (classId && userId) {
-      const userRef = ref(database, `classes/${classId}/users/${userId}`);
-      remove(userRef); // Remove user from presence list
-      goOffline(database); // Disconnect from Firebase
+        const userRootRef = ref(database, `classes/${classId}/users/${userId}`);
+        remove(userRootRef);
+        const signalRootRef = ref(database, `classes/${classId}/signals/${userId}`);
+        remove(signalRootRef);
+        goOffline(database);
     }
   };
 
   const leaveCall = () => {
-    cleanUp();
-    window.location.href = '/';
+    cleanup();
+    // A small delay to allow Firebase to process the 'remove' command
+    setTimeout(() => { window.location.href = '/'; }, 100);
   };
   
-  // 1. Get Media permissions
+  // 1. Get media permissions and setup local stream
   useEffect(() => {
     const setupMedia = async () => {
       setLoading(true);
@@ -85,147 +88,167 @@ function VideoCall() {
     
     setupMedia();
 
-    window.addEventListener('beforeunload', leaveCall);
+    // Attach cleanup function to window events
+    window.addEventListener('beforeunload', cleanup);
 
     return () => {
-      window.removeEventListener('beforeunload', leaveCall);
-      leaveCall();
+      window.removeEventListener('beforeunload', cleanup);
+      cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 2. Setup Firebase and WebRTC logic
+  // 2. Setup Firebase and WebRTC logic, dependent on localStream
   useEffect(() => {
     if (!localStream || !classId || !userId) return;
 
     goOnline(database);
     
-    const userRef = ref(database, `classes/${classId}/users/${userId}`);
     const usersRef = ref(database, `classes/${classId}/users`);
+    const myUserRef = ref(database, `classes/${classId}/users/${userId}`);
     const signalsRef = ref(database, `classes/${classId}/signals`);
+    const mySignalRef = ref(database, `classes/${classId}/signals/${userId}`);
+    const iceCandidatesRef = ref(database, `classes/${classId}/iceCandidates/${userId}`);
 
     // Set presence and configure auto-removal on disconnect
     onValue(ref(database, '.info/connected'), (snap) => {
-        if (snap.val() === true) {
-            set(userRef, { isOnline: true });
-            onDisconnect(userRef).remove();
-            onDisconnect(ref(database, `classes/${classId}/signals/${userId}`)).remove();
-        }
+      if (snap.val() === true) {
+        set(myUserRef, { isOnline: true });
+        onDisconnect(myUserRef).remove();
+        onDisconnect(mySignalRef).remove();
+        onDisconnect(iceCandidatesRef).remove();
+      }
     });
 
-    const createPeerConnection = (peerId: string, initiator: boolean) => {
-        if (peerConnections.current[peerId]) {
-            console.log(`PeerConnection with ${peerId} already exists.`);
-            return peerConnections.current[peerId];
+    const createPeerConnection = (peerId: string) => {
+      console.log(`Creating PeerConnection with ${peerId}`);
+      const pc = new RTCPeerConnection(ICE_SERVERS);
+      
+      localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      
+      pc.ontrack = event => {
+        console.log(`Received remote track from ${peerId}`);
+        setRemoteStreams(prev => ({ ...prev, [peerId]: event.streams[0] }));
+      };
+      
+      pc.onicecandidate = event => {
+        if (event.candidate) {
+            const candidateRef = ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}`);
+            set(child(candidateRef, generateUniqueId()), event.candidate.toJSON());
         }
-        console.log(`Creating PeerConnection to ${peerId} as ${initiator ? 'initiator' : 'receiver'}`);
-        
-        const pc = new RTCPeerConnection(ICE_SERVERS);
-        peerConnections.current[peerId] = pc;
-    
-        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-    
-        pc.ontrack = (event) => {
-            console.log(`Received remote track from ${peerId}`);
-            setRemoteStreams(prev => ({ ...prev, [peerId]: event.streams[0] }));
-        };
+      };
 
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                const iceCandidateRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}/iceCandidates`);
-                set(child(iceCandidateRef, event.candidate.sdpMid! + "_" + event.candidate.sdpMLineIndex), event.candidate.toJSON());
-            }
-        };
-
-        pc.onnegotiationneeded = async () => {
-            if (initiator) {
-                try {
-                    const offer = await pc.createOffer();
-                    await pc.setLocalDescription(offer);
-                    const offerRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`);
-                    set(offerRef, { type: 'offer', sdp: pc.localDescription.sdp });
-                } catch (e) {
-                    console.error("Error creating offer:", e);
-                }
-            }
-        };
-
-        // Listen for signals from the peer
-        listenToSignals(peerId, pc);
-
-        return pc;
+      pc.onconnectionstatechange = () => {
+          console.log(`Connection state with ${peerId}: ${pc.connectionState}`);
+          if (pc.connectionState === 'disconnected' || pc.connectionState === 'closed' || pc.connectionState === 'failed') {
+               pc.close();
+               delete peerConnections.current[peerId];
+               setRemoteStreams(prev => {
+                   const newStreams = { ...prev };
+                   delete newStreams[peerId];
+                   return newStreams;
+               });
+          }
+      };
+      
+      peerConnections.current[peerId] = pc;
+      return pc;
     };
 
-    const listenToSignals = (peerId: string, pc: RTCPeerConnection) => {
-        const peerSignalRef = ref(database, `classes/${classId}/signals/${peerId}/${userId}`);
-        
-        // Listen for SDP (offer/answer)
-        onValue(child(peerSignalRef, 'sdp'), async (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-
-            try {
-                if (data.sdp && pc.currentRemoteDescription?.sdp !== data.sdp) {
-                    const sdp = new RTCSessionDescription(data);
-                    await pc.setRemoteDescription(sdp);
-                    
-                    if (sdp.type === 'offer') {
-                        const answer = await pc.createAnswer();
-                        await pc.setLocalDescription(answer);
-                        const answerRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`);
-                        set(answerRef, { type: 'answer', sdp: pc.localDescription?.sdp });
-                    }
-                }
-            } catch (e) {
-                console.error("Error handling SDP signal:", e);
-            }
-        });
-
-        // Listen for ICE candidates
-        onValue(child(peerSignalRef, 'iceCandidates'), async (snapshot) => {
-            if (snapshot.exists()) {
-                snapshot.forEach(async (candidateSnap) => {
-                    try {
-                        await pc.addIceCandidate(new RTCIceCandidate(candidateSnap.val()));
-                    } catch(e) {
-                        console.error('Error adding received ice candidate', e);
-                    }
-                });
-            }
-        });
-    };
-    
+    // Main listener for user presence
     const usersListener = onValue(usersRef, (snapshot) => {
-        const allUsers = snapshot.val() || {};
-        const allUserIds = Object.keys(allUsers);
-    
-        // Connect to new users
-        for (const peerId of allUserIds) {
-            if (peerId !== userId && !peerConnections.current[peerId]) {
-                 // The user with the "smaller" ID is the initiator to avoid glare
-                 const isInitiator = userId < peerId;
-                 createPeerConnection(peerId, isInitiator);
+      const allUsers = snapshot.val() || {};
+      const allUserIds = Object.keys(allUsers);
+      
+      // Connect to new users
+      for (const peerId of allUserIds) {
+        if (peerId !== userId && !peerConnections.current[peerId]) {
+            const pc = createPeerConnection(peerId);
+
+            // Listen for ICE candidates from this specific peer
+            const peerIceCandidatesRef = ref(database, `classes/${classId}/iceCandidates/${peerId}/${userId}`);
+            onValue(peerIceCandidatesRef, (candidatesSnapshot) => {
+                candidatesSnapshot.forEach(candidateSnap => {
+                    pc.addIceCandidate(new RTCIceCandidate(candidateSnap.val())).catch(e => console.error("Error adding ICE candidate", e));
+                });
+            });
+
+            // The user with the "smaller" ID is the initiator to avoid glare
+            if (userId < peerId) {
+                console.log(`I am the initiator for connection with ${peerId}`);
+                pc.onnegotiationneeded = async () => {
+                    try {
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        await set(ref(database, `classes/${classId}/signals/${userId}/${peerId}`), { type: 'offer', sdp: offer.sdp });
+                    } catch (e) {
+                        console.error("Error creating offer:", e);
+                    }
+                };
             }
         }
-    
-        // Clean up disconnected users
-        for (const peerId in peerConnections.current) {
-            if (!allUsers[peerId]) {
-                peerConnections.current[peerId]?.close();
-                delete peerConnections.current[peerId];
-                setRemoteStreams(prev => {
-                    const newStreams = { ...prev };
-                    delete newStreams[peerId];
-                    return newStreams;
-                });
-            }
+      }
+      
+      // Clean up disconnected users
+      for (const peerId in peerConnections.current) {
+        if (!allUserIds.includes(peerId)) {
+          console.log(`Cleaning up disconnected peer: ${peerId}`);
+          peerConnections.current[peerId]?.close();
+          delete peerConnections.current[peerId];
+          setRemoteStreams(prev => {
+            const newStreams = { ...prev };
+            delete newStreams[peerId];
+            return newStreams;
+          });
+        }
+      }
+    });
+
+    // Listener for incoming signals (offers/answers)
+    const signalsListener = onValue(signalsRef, async (snapshot) => {
+        const allSignals = snapshot.val() || {};
+        if (!allSignals[userId]) return;
+
+        for (const peerId in allSignals[userId]) {
+             if (peerId === 'sdp' || peerId === 'type') continue; // Skip own special keys
+             const signalData = allSignals[userId][peerId];
+
+             if(signalData){
+                 let pc = peerConnections.current[peerId];
+                 if (!pc) {
+                     pc = createPeerConnection(peerId);
+                 }
+                 
+                 if (pc.currentRemoteDescription) continue;
+
+                 if (signalData.type === 'offer') {
+                    console.log(`Received offer from ${peerId}, creating answer`);
+                     try {
+                         await pc.setRemoteDescription(new RTCSessionDescription(signalData));
+                         const answer = await pc.createAnswer();
+                         await pc.setLocalDescription(answer);
+                         await set(ref(database, `classes/${classId}/signals/${userId}/${peerId}`), { type: 'answer', sdp: answer.sdp });
+                     } catch (e) {
+                         console.error("Error handling offer:", e);
+                     }
+                 } else if (signalData.type === 'answer') {
+                    console.log(`Received answer from ${peerId}`);
+                    try {
+                        await pc.setRemoteDescription(new RTCSessionDescription(signalData));
+                    } catch (e) {
+                        console.error("Error handling answer:", e);
+                    }
+                 }
+             }
         }
     });
 
     return () => {
-        usersListener(); // Detach the listener
+      usersListener(); // Detach the listener on cleanup
+      signalsListener();
     };
   }, [localStream, classId, userId]);
+
 
   const toggleMute = () => {
     if (localStream) {
@@ -244,8 +267,14 @@ function VideoCall() {
         });
     }
   };
+  
+  const totalParticipants = Object.keys(remoteStreams).length + 1;
+  const gridCols = totalParticipants <= 1 ? 'grid-cols-1' :
+                   totalParticipants <= 2 ? 'grid-cols-2' :
+                   totalParticipants <= 4 ? 'grid-cols-2' :
+                   totalParticipants <= 9 ? 'grid-cols-3' : 'grid-cols-4';
+  const gridRows = totalParticipants > 4 ? 'grid-rows-2' : 'grid-rows-1';
 
-  const videoGridCols = `grid-cols-${Math.ceil(Math.sqrt(Object.keys(remoteStreams).length + 1))}`;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
@@ -256,7 +285,7 @@ function VideoCall() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={`grid ${videoGridCols} gap-4`}>
+          <div className={`grid ${gridCols} ${gridRows} gap-4`}>
               {/* Local Video */}
               <div className="relative">
                   <video ref={localVideoRef} className="w-full aspect-video rounded-md bg-black object-cover" autoPlay muted playsInline />
