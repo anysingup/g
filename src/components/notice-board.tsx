@@ -9,9 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BellRing, Loader2 } from "lucide-react";
-import { ref, onValue, query, orderByChild, limitToLast } from 'firebase/database';
-import { database } from '@/lib/firebase';
 import type { Notice } from "@/lib/types";
+import { notices as staticNotices } from "@/lib/notices-data";
 
 const toBengaliDateTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -30,23 +29,9 @@ export const NoticeBoard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const noticesRef = query(ref(database, 'notices'), orderByChild('createdAt'), limitToLast(10));
-        
-        const unsubscribe = onValue(noticesRef, (snapshot) => {
-            const data: Record<string, Omit<Notice, 'id'>> = snapshot.val();
-            if (data) {
-                const noticeList: Notice[] = Object.entries(data)
-                    .map(([id, value]) => ({ id, ...value }))
-                    .sort((a, b) => b.createdAt - a.createdAt);
-                setNotices(noticeList);
-            }
-            setLoading(false);
-        }, (error) => {
-            console.error("Firebase read failed:", error);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
+      // Load static notices
+      setNotices(staticNotices);
+      setLoading(false);
     }, []);
 
   return (

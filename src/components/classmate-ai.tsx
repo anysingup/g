@@ -17,9 +17,7 @@ import { getClassmateResponse } from '@/ai/flows/classmate-ai';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { database } from '@/lib/firebase';
-import { ref, onValue, query, orderByChild, limitToLast, serverTimestamp, push } from 'firebase/database';
-import type { AiMessage as Message, StudentInfo } from '@/lib/types';
+import type { AiMessage as Message } from '@/lib/types';
 
 
 const toBase64 = (file: File): Promise<string> =>
@@ -36,43 +34,10 @@ export function ClassmateAi() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    try {
-      const savedInfo = localStorage.getItem('studentInfo');
-      if (savedInfo) {
-        setStudentInfo(JSON.parse(savedInfo));
-      }
-    } catch (error) {
-      console.error("Failed to parse student info from localStorage", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!studentInfo) return;
-
-    const conversationId = `class${studentInfo.class}-roll${studentInfo.roll}`;
-    const messagesRef = query(
-      ref(database, `ai-conversations-by-student/${conversationId}`),
-      orderByChild('timestamp'),
-      limitToLast(20) // Load last 20 messages
-    );
-
-    const unsubscribe = onValue(messagesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const loadedMessages = Object.values(data) as Message[];
-        setConversation(loadedMessages);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [studentInfo]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -110,10 +75,7 @@ export function ClassmateAi() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!query.trim() && !imageFile) || loading || !studentInfo) {
-        if (!studentInfo) {
-            toast({ variant: 'destructive', title: 'ত্রুটি', description: 'অনুগ্রহ করে প্রথমে আপনার তথ্য দিন।' });
-        }
+    if ((!query.trim() && !imageFile) || loading) {
         return;
     }
 
@@ -124,9 +86,7 @@ export function ClassmateAi() {
         timestamp: Date.now() 
     };
     
-    // Optimistically update UI
     setConversation(prev => [...prev, userMessage]);
-    
     setLoading(true);
 
     try {
@@ -150,22 +110,7 @@ export function ClassmateAi() {
         timestamp: Date.now()
       };
 
-       // Save the full conversation log to a central DB for monitoring
-        const conversationLogRef = ref(database, 'ai-conversations');
-        await push(conversationLogRef, {
-            student: studentInfo,
-            query: query,
-            response: result.response,
-            imageUrl: photoDataUri,
-            generatedImage: result.generatedImage,
-            timestamp: serverTimestamp(),
-        });
-
-        // Save messages to student-specific conversation history
-        const conversationId = `class${studentInfo.class}-roll${studentInfo.roll}`;
-        const studentConvoRef = ref(database, `ai-conversations-by-student/${conversationId}`);
-        await push(studentConvoRef, userMessage);
-        await push(studentConvoRef, aiMessage);
+      setConversation(prev => [...prev, aiMessage]);
 
     } catch (error) {
       console.error('AI assistant error:', error);

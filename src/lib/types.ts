@@ -26,25 +26,10 @@ export interface Notice {
   createdAt: number;
 }
 
-export interface StudentInfo {
-  class: string;
-  roll: string;
-}
-
 export interface AiMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: number;
   image?: string; // For user uploads (preview URL)
   generatedImage?: string; // For AI responses
-}
-
-export interface AiConversation {
-  id: string;
-  student: StudentInfo;
-  query: string;
-  response: string;
-  imageUrl?: string; // Base64 data URI of user-uploaded image
-  generatedImage?: string; // Base64 data URI of AI-generated image
-  timestamp: number;
 }
