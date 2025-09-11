@@ -35,6 +35,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { students } from "@/lib/results-data";
 import type { Student, ExamResult } from "@/lib/types";
+import { NoticeBoard } from "@/components/notice-board";
 
 const FormSchema = z.object({
   academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
@@ -87,60 +88,84 @@ function getToppers(): Topper[] {
 }
 
 const ToppersList = () => {
-    const toppers = getToppers();
+  const toppers = getToppers();
 
-    const getClassName = (sClass: number) => {
-      switch (sClass) {
-        case 1: return "প্রথম শ্রেণি";
-        case 2: return "দ্বিতীয় শ্রেণি";
-        case 3: return "তৃতীয় শ্রেণি";
-        case 4: return "চতুর্থ শ্রেণি";
-        case 5: return "পঞ্চম শ্রেণি";
-        default: return "";
-      }
-    };
-    
-    const toBengaliNumber = (enNumber: number | string) => {
-        const en = String(enNumber);
-        const bnMap: { [key: string]: string } = {
-            '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
-        };
-        return en.replace(/[0-9]/g, (n) => bnMap[n]);
-    };
+  const getClassName = (sClass: number) => {
+    switch (sClass) {
+      case 1:
+        return "প্রথম শ্রেণি";
+      case 2:
+        return "দ্বিতীয় শ্রেণি";
+      case 3:
+        return "তৃতীয় শ্রেণি";
+      case 4:
+        return "চতুর্থ শ্রেণি";
+      case 5:
+        return "পঞ্চম শ্রেণি";
+      default:
+        return "";
+    }
+  };
 
-    return (
-        <Card className="shadow-lg mt-8">
-          <CardHeader className="text-center bg-primary/10 rounded-t-lg">
-            <CardTitle className="text-2xl text-primary font-bold flex items-center justify-center gap-2">
-              <Trophy className="h-7 w-7 text-amber-500" />
-              শ্রেণিভিত্তিক প্রথম স্থান
-            </CardTitle>
-            <CardDescription>
-              দ্বিতীয় প্রান্তিক পরীক্ষার ফলাফলের ভিত্তিতে
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <ul className="space-y-4">
-              {toppers.map((topper) => (
-                <li key={topper.class} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                     <div className="text-lg font-bold text-primary w-28">{getClassName(topper.class)}</div>
-                     <div>
-                        <p className="font-semibold text-gray-800">{topper.name}</p>
-                        <p className="text-sm text-muted-foreground">রোল: {toBengaliNumber(topper.roll)}</p>
-                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-green-600">{toBengaliNumber(topper.totalMarks)}</p>
-                    <p className="text-xs text-muted-foreground">মোট নম্বর</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-    );
-}
+  const toBengaliNumber = (enNumber: number | string) => {
+    const en = String(enNumber);
+    const bnMap: { [key: string]: string } = {
+      "0": "০",
+      "1": "১",
+      "2": "২",
+      "3": "৩",
+      "4": "৪",
+      "5": "৫",
+      "6": "৬",
+      "7": "৭",
+      "8": "৮",
+      "9": "৯",
+    };
+    return en.replace(/[0-9]/g, (n) => bnMap[n]);
+  };
+
+  return (
+    <Card className="shadow-lg mt-8">
+      <CardHeader className="text-center bg-primary/10 rounded-t-lg">
+        <CardTitle className="text-2xl text-primary font-bold flex items-center justify-center gap-2">
+          <Trophy className="h-7 w-7 text-amber-500" />
+          শ্রেণিভিত্তিক প্রথম স্থান
+        </CardTitle>
+        <CardDescription>
+          দ্বিতীয় প্রান্তিক পরীক্ষার ফলাফলের ভিত্তিতে
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-6">
+        <ul className="space-y-4">
+          {toppers.map((topper) => (
+            <li
+              key={topper.class}
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-lg font-bold text-primary w-28">
+                  {getClassName(topper.class)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">{topper.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    রোল: {toBengaliNumber(topper.roll)}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-green-600">
+                  {toBengaliNumber(topper.totalMarks)}
+                </p>
+                <p className="text-xs text-muted-foreground">মোট নম্বর</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -171,7 +196,8 @@ export default function Home() {
           হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়
         </h1>
         <p className="text-muted-foreground px-4 sm:px-0">
-          গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ চট্টগ্রাম
+          গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ
+          চট্টগ্রাম
         </p>
         <p className="text-muted-foreground mt-1">EMIS: 91411050804</p>
       </header>
@@ -200,7 +226,7 @@ export default function Home() {
                       <FormItem>
                         <FormLabel>শিক্ষাবর্ষ</FormLabel>
                         <Select
-                          onValuechange={field.onChange}
+                          onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -292,11 +318,11 @@ export default function Home() {
                   />
                 </div>
                 {error && (
-                    <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>ত্রুটি</AlertTitle>
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>ত্রুটি</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
                 )}
                 <div className="flex justify-center pt-2">
                   <Button
@@ -322,6 +348,7 @@ export default function Home() {
           </CardContent>
         </Card>
         <ToppersList />
+        <NoticeBoard />
       </main>
 
       <MultilingualSupport />
