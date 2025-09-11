@@ -26,7 +26,7 @@ export default function JoinClassPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleJoinClass = async () => {
+  const handleJoinClass = () => {
     if (!classId.trim() || !password.trim()) {
       toast({
         variant: 'destructive',
@@ -38,14 +38,21 @@ export default function JoinClassPage() {
     
     setLoading(true);
 
-    try {
-      const classRef = ref(database, `classes/${classId}/password`);
-      const snapshot = await get(classRef);
-
-      if (snapshot.exists()) {
-        const storedPassword = snapshot.val();
-        if (storedPassword === password) {
-          router.push(`/class/${classId}`);
+    const classRef = ref(database, `classes/${classId}/password`);
+    get(classRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const storedPassword = snapshot.val();
+          if (storedPassword === password) {
+            router.push(`/class/${classId}`);
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'প্রবেশ করতে ব্যর্থ',
+              description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            });
+            setLoading(false);
+          }
         } else {
           toast({
             variant: 'destructive',
@@ -54,23 +61,16 @@ export default function JoinClassPage() {
           });
           setLoading(false);
         }
-      } else {
+      })
+      .catch((error) => {
+        console.error("Failed to join class:", error);
         toast({
           variant: 'destructive',
-          title: 'প্রবেশ করতে ব্যর্থ',
-          description: 'ভুল আইডি বা পাসওয়ার্ড। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          title: 'যোগ দিতে ব্যর্থ',
+          description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
         });
         setLoading(false);
-      }
-    } catch (error) {
-      console.error("Failed to join class:", error);
-      toast({
-        variant: 'destructive',
-        title: 'যোগ দিতে ব্যর্থ',
-        description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
       });
-      setLoading(false);
-    }
   };
 
   return (

@@ -33,7 +33,7 @@ export default function CreateClassPage() {
     setClassId(newClassId);
   }, []);
 
-  const handleCreateClass = async () => {
+  const handleCreateClass = () => {
     if (!password.trim()) {
       toast({
         variant: 'destructive',
@@ -54,23 +54,21 @@ export default function CreateClassPage() {
 
     setLoading(true);
 
-    try {
-      // Save the password in Firebase
-      const classRef = ref(database, `classes/${classId}/password`);
-      await set(classRef, password);
-
-      // Redirect to the class page
-      router.push(`/class/${classId}`);
-
-    } catch (error) {
-      console.error("Failed to create class:", error);
-      toast({
-        variant: 'destructive',
-        title: 'ক্লাস তৈরি করতে ব্যর্থ',
-        description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    const classRef = ref(database, `classes/${classId}/password`);
+    set(classRef, password)
+      .then(() => {
+        router.push(`/class/${classId}`);
+        // No need to set loading to false here, as the page is navigating away.
+      })
+      .catch((error) => {
+        console.error("Failed to create class:", error);
+        toast({
+          variant: 'destructive',
+          title: 'ক্লাস তৈরি করতে ব্যর্থ',
+          description: 'একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    }
   };
 
   const copyToClipboard = (text: string) => {
