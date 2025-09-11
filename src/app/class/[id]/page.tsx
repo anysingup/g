@@ -8,7 +8,7 @@ import { Mic, MicOff, PhoneOff, Video, VideoOff, Loader2, User } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { database } from '@/lib/firebase';
-import { ref, onValue, set, onDisconnect, remove } from 'firebase/database';
+import { ref, onValue, set, onDisconnect, remove, goOffline, goOnline } from 'firebase/database';
 
 // Simple unique ID generator
 const generateUniqueId = () => Math.random().toString(36).substr(2, 9);
@@ -22,11 +22,9 @@ const ICE_SERVERS = {
 
 function VideoCall() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
 
   const classId = params.id as string;
-  const password = searchParams.get('password'); // We can add password validation later
   
   const [userId] = useState(generateUniqueId());
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -38,46 +36,30 @@ function VideoCall() {
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [loading, setLoading] = useState(true);
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideosRef = useRef<HTMLDivElement>(null);
 
-  // Function to clean up a single peer connection
-  const cleanupPeerConnection = (peerId: string) => {
-    if (peerConnections.current[peerId]) {
-      peerConnections.current[peerId].close();
-      delete peerConnections.current[peerId];
+  const cleanUp = () => {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
     }
-    setRemoteStreams(prev => {
-      const newStreams = {...prev};
-      delete newStreams[peerId];
-      return newStreams;
-    });
-  };
-
-  // Function to handle leaving the call
-  const leaveCall = () => {
-    // Stop local media tracks
-    localStream?.getTracks().forEach(track => track.stop());
-    setLocalStream(null);
-
-    // Close all peer connections
-    Object.keys(peerConnections.current).forEach(peerId => {
-      cleanupPeerConnection(peerId);
-    });
-
-    // Remove user from Firebase
+    Object.values(peerConnections.current).forEach(pc => pc.close());
+    peerConnections.current = {};
+    
     if (classId && userId) {
         const userRef = ref(database, `classes/${classId}/users/${userId}`);
         remove(userRef);
+        // This might be abrupt, but it's a good way to ensure cleanup
+        goOffline(database);
     }
-
-    // Redirect to home page
-    window.location.href = '/';
   };
 
-
-  // 1. Get Media permissions
+  const leaveCall = () => {
+    cleanUp();
+    window.location.href = '/';
+  };
+  
+  // 1. Get Media permissions & Basic Setup
   useEffect(() => {
-    const getMedia = async () => {
+    const setup = async () => {
       setLoading(true);
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -98,158 +80,136 @@ function VideoCall() {
         setLoading(false);
       }
     };
-    getMedia();
+    setup();
 
-    // Add beforeunload event listener to handle leaving the call
-    window.addEventListener('beforeunload', leaveCall);
+    window.addEventListener('beforeunload', cleanUp);
 
     return () => {
-      window.removeEventListener('beforeunload', leaveCall);
-      // This cleanup runs when the component is unmounted
-      leaveCall();
+      window.removeEventListener('beforeunload', cleanUp);
+      cleanUp();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   // 2. Setup Firebase and WebRTC logic
   useEffect(() => {
     if (!localStream || !classId || !userId) return;
 
-    const classRef = ref(database, `classes/${classId}`);
+    goOnline(database);
+    
     const userRef = ref(database, `classes/${classId}/users/${userId}`);
-    const usersRef = ref(database, `classes/${classId}/users`);
+    const allUsersRef = ref(database, `classes/${classId}/users`);
 
-    // Set user presence and plan cleanup on disconnect
-    const presenceRef = ref(database, `.info/connected`);
-    onValue(presenceRef, (snap) => {
+    const connectedRef = ref(database, '.info/connected');
+    onValue(connectedRef, (snap) => {
         if (snap.val() === true) {
-            set(userRef, { present: true });
+            set(userRef, { isOnline: true });
             onDisconnect(userRef).remove();
         }
     });
 
-    const handleNewUser = async (peerId: string) => {
-      if (peerId === userId || peerConnections.current[peerId]) return;
+    const createPeerConnection = (peerId: string) => {
+      if (peerConnections.current[peerId]) return peerConnections.current[peerId];
 
-      console.log(`New user detected: ${peerId}. Creating peer connection.`);
       const pc = new RTCPeerConnection(ICE_SERVERS);
       peerConnections.current[peerId] = pc;
 
-      // Add local stream tracks
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
 
-      // Handle remote stream
       pc.ontrack = (event) => {
-         console.log(`Track received from ${peerId}`);
-         setRemoteStreams(prev => ({...prev, [peerId]: event.streams[0]}));
+        setRemoteStreams(prev => ({ ...prev, [peerId]: event.streams[0] }));
       };
-
-      // Handle ICE candidates
-      const localIceCandidatesRef = ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}`);
-      onDisconnect(localIceCandidatesRef).remove();
+      
+      const signalsRef = ref(database, `classes/${classId}/signals/${userId}/${peerId}`);
+      onDisconnect(signalsRef).remove();
 
       pc.onicecandidate = (event) => {
         if (event.candidate) {
-           const candidateRef = ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}/${event.candidate.sdpMid}_${event.candidate.sdpMLineIndex}`);
-           set(candidateRef, event.candidate.toJSON());
+          set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/iceCandidates/${event.candidate.sdpMid}_${event.candidate.sdpMLineIndex}`), event.candidate.toJSON());
         }
       };
 
-      const remoteIceCandidatesRef = ref(database, `classes/${classId}/iceCandidates/${peerId}/${userId}`);
-       onValue(remoteIceCandidatesRef, (snapshot) => {
-        if (snapshot.exists()) {
-          snapshot.forEach((childSnapshot) => {
-            const candidate = childSnapshot.val();
-            pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("Error adding received ice candidate", e));
-          });
-        }
-      });
-      
-      // Signaling logic (Offer/Answer)
-      const offersRef = ref(database, `classes/${classId}/offers`);
-
-      // Listen for offers/answers from the other peer
-      onValue(ref(offersRef, `${peerId}-${userId}`), async (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.sdp) {
-            try {
-                if (data.sdp.type === 'offer') {
-                    console.log(`Received offer from ${peerId}`);
-                    await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-                    const answer = await pc.createAnswer();
-                    await pc.setLocalDescription(answer);
-                    await set(ref(offersRef, `${userId}-${peerId}`), { sdp: pc.localDescription });
-                }
-            } catch (err) {
-                console.error("Error handling offer: ", err)
-            }
-        }
-      });
-        
-      onValue(ref(offersRef, `${userId}-${peerId}`), async(snapshot) => {
-          const data = snapshot.val();
-          if (data && data.sdp && data.sdp.type === 'answer') {
-              try {
-                console.log(`Received answer from ${peerId}`);
-                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-              } catch(err) {
-                console.error("Error handling answer: ", err);
-              }
-          }
-      });
-
-      // Create offer
-      try {
-          console.log(`Creating offer for ${peerId}`);
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          await set(ref(offersRef, `${userId}-${peerId}`), { sdp: pc.localDescription });
-      } catch (err) {
-          console.error("Offer creation error: ", err);
-      }
+      return pc;
     };
 
-    const handleUserLeft = (peerId: string) => {
-       console.log(`User ${peerId} left.`);
-       cleanupPeerConnection(peerId);
-       // Clean up database entries for the user who left
-       remove(ref(database, `classes/${classId}/offers/${userId}-${peerId}`));
-       remove(ref(database, `classes/${classId}/offers/${peerId}-${userId}`));
-       remove(ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}`));
-       remove(ref(database, `classes/${classId}/iceCandidates/${peerId}/${userId}`));
+    const handleUserEvent = (snapshot: any) => {
+        const allUsers = snapshot.val() || {};
+
+        // Handle new users
+        for (const peerId in allUsers) {
+            if (peerId !== userId && !peerConnections.current[peerId]) {
+                const pc = createPeerConnection(peerId);
+
+                // Listen for signals from the new peer
+                const remoteSignalRef = ref(database, `classes/${classId}/signals/${peerId}/${userId}`);
+                onValue(remoteSignalRef, async (signalSnap) => {
+                    const signal = signalSnap.val();
+                    if (!signal || !pc) return;
+
+                    try {
+                      if (signal.sdp && pc.currentRemoteDescription?.type !== signal.sdp.type) {
+                          await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                          if (signal.sdp.type === 'offer') {
+                              const answer = await pc.createAnswer();
+                              await pc.setLocalDescription(answer);
+                              set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), pc.localDescription);
+                          }
+                      }
+                      
+                      if(signal.iceCandidates){
+                          Object.values(signal.iceCandidates).forEach(async (candidate: any) => {
+                              try {
+                                  await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                              } catch (e) {
+                                  // Ignore benign errors
+                                  if (!e.toString().includes("OperationError: Failed to add ICE candidate")) {
+                                     console.error("Error adding received ICE candidate:", e);
+                                  }
+                              }
+                          });
+                      }
+                    } catch(e){
+                        console.error("Error handling signal: ", e)
+                    }
+                }, { onlyOnce: false });
+
+                // Create offer for the new user
+                pc.onnegotiationneeded = async () => {
+                    try {
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        set(ref(database, `classes/${classId}/signals/${userId}/${peerId}/sdp`), pc.localDescription);
+                    } catch (e) {
+                        console.error("Error creating offer:", e);
+                    }
+                };
+            }
+        }
+
+        // Handle disconnected users
+        for (const peerId in peerConnections.current) {
+            if (!allUsers[peerId]) {
+                peerConnections.current[peerId].close();
+                delete peerConnections.current[peerId];
+                setRemoteStreams(prev => {
+                    const newStreams = { ...prev };
+                    delete newStreams[peerId];
+                    return newStreams;
+                });
+                // Also clean up their signal path
+                remove(ref(database, `classes/${classId}/signals/${userId}/${peerId}`));
+            }
+        }
     };
-
-    const usersListener = onValue(usersRef, (snapshot) => {
-        const users = snapshot.val() || {};
-        const allUserIds = Object.keys(users);
-
-        // New users
-        allUserIds.forEach(peerId => {
-            if (peerId !== userId && users[peerId]?.present) {
-                 handleNewUser(peerId);
-            }
-        });
-        
-        // Disconnected users
-        Object.keys(peerConnections.current).forEach(peerId => {
-            if (!users[peerId]?.present) {
-                handleUserLeft(peerId);
-            }
-        });
-    });
+    
+    const usersListener = onValue(allUsersRef, handleUserEvent);
 
     return () => {
-        // Cleanup listener when component unmounts
-        usersListener();
-        remove(userRef);
-         Object.keys(peerConnections.current).forEach(peerId => {
-            handleUserLeft(peerId);
-        });
-    }
-
-  }, [localStream, classId, userId, toast]);
-
+      usersListener(); // Detach listener
+      cleanUp();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localStream, classId, userId]);
 
   const toggleMute = () => {
     if (localStream) {
@@ -269,6 +229,8 @@ function VideoCall() {
     }
   };
 
+  const videoGridCols = `grid-cols-${Math.max(1, Math.min(3, Object.keys(remoteStreams).length + 1))}`;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       <Card className="w-full max-w-6xl bg-gray-800 border-gray-700">
@@ -278,7 +240,7 @@ function VideoCall() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" ref={remoteVideosRef}>
+          <div className={`grid ${videoGridCols} gap-4`}>
               {/* Local Video */}
               <div className="relative">
                   <video ref={localVideoRef} className="w-full aspect-video rounded-md bg-black object-cover" autoPlay muted />
@@ -331,7 +293,7 @@ function VideoCall() {
               variant={isMuted ? 'destructive' : 'secondary'}
               size="icon"
               className="rounded-full h-14 w-14"
-              disabled={!hasPermissions}
+              disabled={!localStream}
             >
               {isMuted ? <MicOff /> : <Mic />}
             </Button>
@@ -340,7 +302,7 @@ function VideoCall() {
               variant={isCameraOff ? 'destructive' : 'secondary'}
               size="icon"
               className="rounded-full h-14 w-14"
-              disabled={!hasPermissions}
+              disabled={!localStream}
             >
               {isCameraOff ? <VideoOff /> : <Video />}
             </Button>
