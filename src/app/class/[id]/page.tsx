@@ -65,14 +65,17 @@ function VideoCall() {
     });
 
     // Remove user from Firebase
-    const userRef = ref(database, `classes/${classId}/users/${userId}`);
-    remove(userRef);
+    if (classId && userId) {
+        const userRef = ref(database, `classes/${classId}/users/${userId}`);
+        remove(userRef);
+    }
 
     // Redirect to home page
     window.location.href = '/';
   };
 
 
+  // 1. Get Media permissions
   useEffect(() => {
     const getMedia = async () => {
       setLoading(true);
@@ -97,13 +100,19 @@ function VideoCall() {
     };
     getMedia();
 
-     return () => {
+    // Add beforeunload event listener to handle leaving the call
+    window.addEventListener('beforeunload', leaveCall);
+
+    return () => {
+      window.removeEventListener('beforeunload', leaveCall);
+      // This cleanup runs when the component is unmounted
       leaveCall();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
+  // 2. Setup Firebase and WebRTC logic
   useEffect(() => {
     if (!localStream || !classId || !userId) return;
 
@@ -142,14 +151,16 @@ function VideoCall() {
 
       pc.onicecandidate = (event) => {
         if (event.candidate) {
-          set(ref(localIceCandidatesRef, event.candidate.sdpMid! + '_' + event.candidate.sdpMLineIndex), event.candidate.toJSON());
+           const candidateRef = ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}/${event.candidate.sdpMid}_${event.candidate.sdpMLineIndex}`);
+           set(candidateRef, event.candidate.toJSON());
         }
       };
 
       const remoteIceCandidatesRef = ref(database, `classes/${classId}/iceCandidates/${peerId}/${userId}`);
-      onValue(remoteIceCandidatesRef, (snapshot) => {
+       onValue(remoteIceCandidatesRef, (snapshot) => {
         if (snapshot.exists()) {
-          Object.values(snapshot.val()).forEach((candidate: any) => {
+          snapshot.forEach((childSnapshot) => {
+            const candidate = childSnapshot.val();
             pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("Error adding received ice candidate", e));
           });
         }
@@ -159,36 +170,43 @@ function VideoCall() {
       const offersRef = ref(database, `classes/${classId}/offers`);
 
       // Listen for offers/answers from the other peer
-      onValue(ref(offersRef, peerId), async (snapshot) => {
+      onValue(ref(offersRef, `${peerId}-${userId}`), async (snapshot) => {
         const data = snapshot.val();
-        if (data && data.to === userId) {
+        if (data && data.sdp) {
             try {
                 if (data.sdp.type === 'offer') {
                     console.log(`Received offer from ${peerId}`);
                     await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
                     const answer = await pc.createAnswer();
                     await pc.setLocalDescription(answer);
-                    await set(ref(offersRef, userId), { to: peerId, sdp: pc.localDescription });
-                } else if (data.sdp.type === 'answer') {
-                    console.log(`Received answer from ${peerId}`);
-                    await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                    await set(ref(offersRef, `${userId}-${peerId}`), { sdp: pc.localDescription });
                 }
             } catch (err) {
-                console.error("Error handling offer/answer: ", err)
+                console.error("Error handling offer: ", err)
             }
         }
       });
-
-      // Create offer if we are the "initiator" (e.g., the one with the smaller userId)
-      if (userId < peerId) {
-          try {
-              console.log(`Creating offer for ${peerId}`);
-              const offer = await pc.createOffer();
-              await pc.setLocalDescription(offer);
-              await set(ref(offersRef, userId), { to: peerId, sdp: pc.localDescription });
-          } catch (err) {
-              console.error("Offer creation error: ", err);
+        
+      onValue(ref(offersRef, `${userId}-${peerId}`), async(snapshot) => {
+          const data = snapshot.val();
+          if (data && data.sdp && data.sdp.type === 'answer') {
+              try {
+                console.log(`Received answer from ${peerId}`);
+                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+              } catch(err) {
+                console.error("Error handling answer: ", err);
+              }
           }
+      });
+
+      // Create offer
+      try {
+          console.log(`Creating offer for ${peerId}`);
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          await set(ref(offersRef, `${userId}-${peerId}`), { sdp: pc.localDescription });
+      } catch (err) {
+          console.error("Offer creation error: ", err);
       }
     };
 
@@ -196,7 +214,8 @@ function VideoCall() {
        console.log(`User ${peerId} left.`);
        cleanupPeerConnection(peerId);
        // Clean up database entries for the user who left
-       remove(ref(database, `classes/${classId}/offers/${peerId}`));
+       remove(ref(database, `classes/${classId}/offers/${userId}-${peerId}`));
+       remove(ref(database, `classes/${classId}/offers/${peerId}-${userId}`));
        remove(ref(database, `classes/${classId}/iceCandidates/${userId}/${peerId}`));
        remove(ref(database, `classes/${classId}/iceCandidates/${peerId}/${userId}`));
     };
@@ -224,6 +243,9 @@ function VideoCall() {
         // Cleanup listener when component unmounts
         usersListener();
         remove(userRef);
+         Object.keys(peerConnections.current).forEach(peerId => {
+            handleUserLeft(peerId);
+        });
     }
 
   }, [localStream, classId, userId, toast]);
