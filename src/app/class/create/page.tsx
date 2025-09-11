@@ -27,7 +27,8 @@ export default function CreateClassPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Generate a random 6-digit class ID
+    // Generate a random 6-digit class ID only on the client-side
+    // to prevent hydration errors.
     const newClassId = Math.floor(100000 + Math.random() * 900000).toString();
     setClassId(newClassId);
   }, []);
@@ -40,6 +41,15 @@ export default function CreateClassPage() {
         description: 'অনুগ্রহ করে একটি পাসওয়ার্ড দিন।',
       });
       return;
+    }
+
+    if (!classId) {
+        toast({
+            variant: 'destructive',
+            title: 'ত্রুটি',
+            description: 'ক্লাস আইডি তৈরি হয়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।',
+        });
+        return;
     }
 
     setLoading(true);
@@ -64,6 +74,7 @@ export default function CreateClassPage() {
   };
 
   const copyToClipboard = (text: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     toast({
       title: 'সফলভাবে কপি করা হয়েছে!',
@@ -95,7 +106,7 @@ export default function CreateClassPage() {
             <Label htmlFor="class-id">ক্লাস আইডি</Label>
             <div className="flex items-center gap-2">
               <Input id="class-id" value={classId} readOnly className="bg-gray-100" />
-              <Button variant="outline" size="icon" onClick={() => copyToClipboard(classId)}>
+              <Button variant="outline" size="icon" onClick={() => copyToClipboard(classId)} disabled={!classId}>
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
@@ -113,7 +124,7 @@ export default function CreateClassPage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleCreateClass} className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+          <Button onClick={handleCreateClass} className="w-full bg-primary hover:bg-primary/90" disabled={loading || !classId}>
             {loading ? (
                 <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
