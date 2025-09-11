@@ -41,43 +41,34 @@ export async function getClassmateResponse(
   return classmateAiFlow(input);
 }
 
-const imageGenClassifierPrompt = ai.definePrompt({
-    name: 'imageGenClassifierPrompt',
-    input: { schema: z.object({ query: z.string() }) },
-    output: { schema: z.object({ shouldGenerate: z.boolean() }) },
-    prompt: `You are a text classifier. Your task is to determine if the user's query is a request to generate an image.
-    The user is a primary school student in Bangladesh and will likely ask in Bengali.
-    Keywords to look for: "আঁকো" (draw), "ছবি" (picture/image), "তৈরি করো" (create).
-    
-    Examples:
-    - "একটি বিড়ালের ছবি আঁকো" -> shouldGenerate: true
-    - "গণিত সমস্যাটি সমাধান কর" -> shouldGenerate: false
-    - "একটি সুন্দর ফুলের ছবি তৈরি করো" -> shouldGenerate: true
-    - "What is the capital of France?" -> shouldGenerate: false
-    - "Draw a house" -> shouldGenerate: true
+const mainPrompt = ai.definePrompt({
+    name: 'mainPrompt',
+    input: { schema: ClassmateAiInputSchema },
+    output: { schema: z.object({
+        task: z.enum(['answer_question', 'generate_image', 'tutor_english']),
+        response: z.string().optional(),
+    }) },
+    prompt: `You are a multi-talented AI assistant for students in Bangladesh, named "Sahapathi AI".
+    Your primary goal is to determine the user's intent and respond accordingly.
 
+    You have three main tasks:
+    1.  'generate_image': If the user asks you to draw, create, or make a picture (e.g., "একটি বিড়ালের ছবি আঁকো", "draw a flower").
+    2.  'tutor_english': If the user expresses a desire to learn English (e.g., "আমি ইংরেজি শিখতে চাই", "teach me English").
+    3.  'answer_question': For any other question, problem, or conversation.
+
+    Analyze the user's query and the conversation history to determine the correct task.
+
+    Conversation History:
+    {{#each conversationHistory}}
+    - {{sender}}: {{text}}
+    {{/each}}
+    
     User Query: "{{query}}"
+
+    Based on the query, classify the task.
     `,
 });
 
-const languageLearningClassifierPrompt = ai.definePrompt({
-    name: 'languageLearningClassifierPrompt',
-    input: { schema: z.object({ query: z.string() }) },
-    output: { schema: z.object({ wantsToLearn: z.boolean() }) },
-    prompt: `You are a text classifier. Your task is to determine if the user wants to learn English.
-    The user is a primary school student or teacher in Bangladesh.
-    Keywords to look for: "শিখব" (learn), "শিখতে চাই" (want to learn), "ইংলিশ" (English), "ইংরেজি", "English".
-    
-    Examples:
-    - "আমি ইংরেজি শিখব" -> wantsToLearn: true
-    - "গণিত সমস্যাটি সমাধান কর" -> wantsToLearn: false
-    - "I want to learn English" -> wantsToLearn: true
-    - "How are you?" -> wantsToLearn: false
-    - "আমাকে ইংরেজি শেখাও" -> wantsToLearn: true
-
-    User Query: "{{query}}"
-    `,
-});
 
 const englishTutorPrompt = ai.definePrompt({
   name: 'englishTutorPrompt',
@@ -138,37 +129,34 @@ const classmateAiFlow = ai.defineFlow(
     inputSchema: ClassmateAiInputSchema,
     outputSchema: ClassmateAiOutputSchema,
   },
-  async input => {
-    try {
-        const { output: imageClassification } = await imageGenClassifierPrompt({query: input.query});
+  async (input) => {
+    // 1. Classify the user's intent
+    const { output: classification } = await mainPrompt(input);
 
-        if (imageClassification?.shouldGenerate) {
-            try {
-                const imageResult = await generateImage(input.query);
-                return {
-                    response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
-                    generatedImage: imageResult.imageDataUri,
-                };
-            } catch (error) {
-                console.error('Image generation failed:', error);
-                return {
-                    response: 'দুঃখিত, আমি ছবিটি তৈরি করতে পারিনি। অন্য কিছু চেষ্টা করে দেখবে?',
-                };
-            }
+    // 2. Route to the correct task
+    switch (classification?.task) {
+      case 'generate_image':
+        try {
+          const imageResult = await generateImage(input.query);
+          return {
+            response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
+            generatedImage: imageResult.imageDataUri,
+          };
+        } catch (error) {
+          console.error('Image generation failed:', error);
+          return {
+            response: 'দুঃখিত, আমি ছবিটি তৈরি করতে পারিনি। অন্য কিছু চেষ্টা করে দেখবে?',
+          };
         }
-
-        const { output: learningClassification } = await languageLearningClassifierPrompt({query: input.query});
-
-        if(learningClassification?.wantsToLearn) {
-             const {output} = await englishTutorPrompt(input);
-             return output!;
-        }
-
-    } catch (error) {
-        console.error('Classification failed. Falling back to text generation.', error);
+      
+      case 'tutor_english':
+        const { output: tutorOutput } = await englishTutorPrompt(input);
+        return tutorOutput!;
+      
+      case 'answer_question':
+      default:
+        const { output: answerOutput } = await classmateAiPrompt(input);
+        return answerOutput!;
     }
-
-    const {output} = await classmateAiPrompt(input);
-    return output!;
   }
 );
