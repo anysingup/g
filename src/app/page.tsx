@@ -367,6 +367,7 @@ export default function HomePage() {
             <NoticeBoard />
           </TabsContent>
           <TabsContent value="ai-assistant">
+            <p className="text-center text-sm text-muted-foreground">this AI made by Omar Faruque ( Afif )</p>
             <ClassmateAi />
           </TabsContent>
         </Tabs>

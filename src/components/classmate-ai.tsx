@@ -234,7 +234,6 @@ export function ClassmateAi() {
           </Button>
           </div>
         </form>
-         <p className="text-xs text-muted-foreground mt-2">Make by Omar Faruque (Afif)</p>
       </CardFooter>
     </Card>
   );
