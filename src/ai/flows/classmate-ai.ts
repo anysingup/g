@@ -41,6 +41,22 @@ export async function getClassmateResponse(
   return classmateAiFlow(input);
 }
 
+const imageRequestDetectorPrompt = ai.definePrompt({
+  name: 'imageRequestDetector',
+  input: { schema: z.object({ query: z.string() }) },
+  output: { schema: z.object({ isImageRequest: z.boolean(), imagePrompt: z.string().optional() }) },
+  prompt: `You are an expert in detecting user intent. Analyze the following user query. Determine if the user is asking to draw, create, or generate an image.
+
+  User query: "{{query}}"
+
+  If the user is asking for an image, set "isImageRequest" to true and provide a simple, clean English prompt for an image generation model in the "imagePrompt" field.
+  If the user is not asking for an image, set "isImageRequest" to false.`,
+  config: {
+    model: 'googleai/gemini-2.5-flash',
+  }
+});
+
+
 const classmateAiPrompt = ai.definePrompt({
   name: 'classmateAiPrompt',
   input: {schema: ClassmateAiInputSchema},
@@ -52,12 +68,10 @@ Your capabilities are:
 2.  **Tutor English:** If the user wants to learn English, act as a patient tutor. Use a mix of simple Bengali and English.
 3.  **Creative Writing:** Write age-appropriate stories, poems, or songs in Bengali on request. The tone should be simple, engaging, and positive.
 4.  **Identify from Photo:** If a user uploads a photo and asks who the person is, or what is in the image, analyze the photo and provide a simple, descriptive answer.
-5.  **Generate Images:** If the user asks you to draw, create, or make a picture (e.g., "একটা বিড়ালের ছবি আঁকো", "draw a flower"), you MUST respond ONLY with a special command in this format: [GENERATE_IMAGE: A simple drawing of a cat]. The description inside the tag should be in English.
 
 **Instructions:**
 - Analyze the user's query, conversation history, and any provided photo.
-- **If the user asks for an image, you MUST ONLY output the [GENERATE_IMAGE: ...] command.** Do not add any other text.
-- For all other queries (general questions, creative writing, image identification), provide a helpful response in simple Bengali.
+- Provide a helpful response in simple Bengali.
 - Always be encouraging, maintain a friendly and positive tone, like a true classmate.
 
 {{#if photoDataUri}}
@@ -85,16 +99,12 @@ const classmateAiFlow = ai.defineFlow(
     outputSchema: ClassmateAiOutputSchema,
   },
   async (input) => {
-    const { output } = await classmateAiPrompt(input);
-    const responseText = output?.response || '';
 
-    const imageRegex = /\[GENERATE_IMAGE: (.*?)\]/;
-    const imageMatch = responseText.match(imageRegex);
+    const imageDetectionResult = await imageRequestDetectorPrompt({ query: input.query });
 
-    if (imageMatch && imageMatch[1]) {
-        const imagePrompt = imageMatch[1];
+    if (imageDetectionResult.output?.isImageRequest && imageDetectionResult.output.imagePrompt) {
         try {
-            const imageResult = await generateImage(imagePrompt);
+            const imageResult = await generateImage(imageDetectionResult.output.imagePrompt);
             if (imageResult && imageResult.imageDataUri) {
                 return {
                     response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
@@ -109,7 +119,9 @@ const classmateAiFlow = ai.defineFlow(
             };
         }
     }
-
+    
+    // If it's not an image generation request, proceed with the normal response.
+    const { output } = await classmateAiPrompt(input);
     return output!;
   }
 );
