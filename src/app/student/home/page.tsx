@@ -1,0 +1,522 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultilingualSupport } from "@/components/multilingual-support";
+import { Loader2, Search, Trophy, LogOut } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { students } from "@/lib/results-data";
+import { NoticeBoard } from "@/components/notice-board";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClassmateAi } from "@/components/classmate-ai";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+
+
+const FormSchema = z.object({
+  academicYear: z.string().min(1, { message: "শিক্ষাবর্ষ নির্বাচন করুন।" }),
+  class: z.string().min(1, { message: "শ্রেণী নির্বাচন করুন।" }),
+  examType: z.string().min(1, { message: "পরীক্ষার ধরন নির্বাচন করুন।" }),
+  rollNumber: z
+    .string()
+    .regex(/^[0-9]+$/, "শুধুমাত্র সংখ্যা দিন।")
+    .min(1, { message: "রোল নম্বর দিন।" }),
+});
+
+const StudentInfoSchema = z.object({
+  class: z.string().min(1, { message: "শ্রেণী নির্বাচন করুন।" }),
+  rollNumber: z
+    .string()
+    .regex(/^[0-9]+$/, "শুধুমাত্র সংখ্যা দিন।")
+    .min(1, { message: "রোল নম্বর দিন।" }),
+});
+
+
+type Topper = {
+  name: string;
+  roll: number;
+  class: number;
+  totalMarks: number;
+};
+
+function getToppers(): Topper[] {
+  const toppers: Topper[] = [];
+  const examType = "দ্বিতীয় প্রান্তিক";
+
+  for (let i = 1; i <= 5; i++) {
+    const classStudents = students.filter((s) => s.class === i);
+    let classTopper: Topper | null = null;
+
+    classStudents.forEach((student) => {
+      const result = student.results.find((r) => r.examType === examType);
+      if (result) {
+        const totalMarks = result.subjects.reduce(
+          (acc, sub) => acc + sub.terminal + sub.continuous,
+          0
+        );
+        if (!classTopper || totalMarks > classTopper.totalMarks) {
+          classTopper = {
+            name: student.name,
+            roll: student.roll,
+            class: student.class,
+            totalMarks: totalMarks,
+          };
+        }
+      }
+    });
+
+    if (classTopper) {
+      toppers.push(classTopper);
+    }
+  }
+  return toppers;
+}
+
+const ToppersList = () => {
+  const toppers = getToppers();
+
+  const getClassName = (sClass: number) => {
+    switch (sClass) {
+      case 1:
+        return "প্রথম শ্রেণি";
+      case 2:
+        return "দ্বিতীয় শ্রেণি";
+      case 3:
+        return "তৃতীয় শ্রেণি";
+      case 4:
+        return "চতুর্থ শ্রেণি";
+      case 5:
+        return "পঞ্চম শ্রেণি";
+      default:
+        return "";
+    }
+  };
+
+  const toBengaliNumber = (enNumber: number | string) => {
+    const en = String(enNumber);
+    const bnMap: { [key: string]: string } = {
+      "0": "০",
+      "1": "১",
+      "2": "২",
+      "3": "৩",
+      "4": "৪",
+      "5": "৫",
+      "6": "৬",
+      "7": "৭",
+      "8": "৮",
+      "9": "৯",
+    };
+    return en.replace(/[0-9]/g, (n) => bnMap[n]);
+  };
+
+  return (
+    <Card className="shadow-lg mt-8">
+      <CardHeader className="text-center bg-primary/10 rounded-t-lg">
+        <CardTitle className="text-2xl text-primary font-bold flex items-center justify-center gap-2">
+          <Trophy className="h-7 w-7 text-amber-500" />
+          শ্রেণিভিত্তিক প্রথম স্থান
+        </CardTitle>
+        <CardDescription>
+          দ্বিতীয় প্রান্তিক পরীক্ষার ফলাফলের ভিত্তিতে
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-6">
+        <ul className="space-y-4">
+          {toppers.map((topper) => (
+            <li
+              key={topper.class}
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-lg font-bold text-primary w-28">
+                  {getClassName(topper.class)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">{topper.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    রোল: {toBengaliNumber(topper.roll)}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-green-600">
+                  {toBengaliNumber(topper.totalMarks)}
+                </p>
+                <p className="text-xs text-muted-foreground">মোট নম্বর</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default function StudentHomePage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const [studentInfo, setStudentInfo] = useState<{class: string; roll: string} | null>(null);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      academicYear: "2025",
+      class: "",
+      examType: "",
+      rollNumber: "",
+    },
+  });
+
+  const studentInfoForm = useForm<z.infer<typeof StudentInfoSchema>>({
+    resolver: zodResolver(StudentInfoSchema),
+    defaultValues: {
+      class: "",
+      rollNumber: "",
+    },
+  });
+  
+  useEffect(() => {
+    setIsClient(true);
+    const userRole = localStorage.getItem('userRole');
+    if (userRole !== 'student') {
+      router.push('/');
+      return;
+    }
+    
+    const savedStudentInfo = localStorage.getItem('studentInfo');
+    if (savedStudentInfo) {
+      const info = JSON.parse(savedStudentInfo);
+      setStudentInfo(info);
+      form.setValue('class', info.class);
+      form.setValue('rollNumber', info.roll);
+    } else {
+      setIsInfoModalOpen(true);
+    }
+  }, [router, form]);
+  
+  const handleStudentInfoSubmit = (data: z.infer<typeof StudentInfoSchema>) => {
+    const studentData = { class: data.class, roll: data.rollNumber };
+    localStorage.setItem('studentInfo', JSON.stringify(studentData));
+    setStudentInfo(studentData);
+    form.setValue('class', studentData.class);
+    form.setValue('rollNumber', studentData.roll);
+    setIsInfoModalOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('studentInfo');
+    router.push('/');
+  };
+
+
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    setLoading(true);
+    setError(null);
+    const params = new URLSearchParams(data);
+    router.push(`/result?${params.toString()}`);
+  }
+
+  if (!isClient) {
+    return null; // Or a loading spinner
+  }
+
+  return (
+    <>
+    <Dialog open={isInfoModalOpen} onOpenChange={setIsInfoModalOpen}>
+        <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
+          <Form {...studentInfoForm}>
+            <form onSubmit={studentInfoForm.handleSubmit(handleStudentInfoSubmit)}>
+                <DialogHeader>
+                    <DialogTitle>আপনার তথ্য দিন</DialogTitle>
+                    <DialogDescription>
+                        ফলাফল দেখতে ও অন্যান্য ফিচার ব্যবহার করতে আপনার শ্রেণি ও রোল নম্বর দিন।
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <FormField
+                        control={studentInfoForm.control}
+                        name="class"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>শ্রেণি</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="একটি শ্রেণী নির্বাচন করুন" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="1">প্রথম শ্রেণী</SelectItem>
+                                <SelectItem value="2">দ্বিতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="3">তৃতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="4">চতুর্থ শ্রেণী</SelectItem>
+                                <SelectItem value="5">পঞ্চম শ্রেণী</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={studentInfoForm.control}
+                        name="rollNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>রোল নম্বর</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="আপনার রোল নম্বর"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                </div>
+                <DialogFooter>
+                    <Button type="submit">সংরক্ষণ করুন</Button>
+                </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+    </Dialog>
+
+
+    <div className="flex flex-col items-center min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+      <header className="w-full max-w-4xl text-center mb-8 flex flex-col items-center">
+        <div className="w-full flex justify-between items-center">
+            <div></div>
+            <div className="flex flex-col items-center">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">
+                হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়
+                </h1>
+                <p className="text-muted-foreground px-4 sm:px-0">
+                গ্রামঃ হরিণখাইন, ওয়ার্ড নংঃ ০৬, ডাকঘরঃ বুধপুরা, উপজেলাঃ পটিয়া, জেলাঃ
+                চট্টগ্রাম
+                </p>
+                <p className="text-muted-foreground mt-1">EMIS: 91411050804</p>
+            </div>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              লগ আউট
+            </Button>
+        </div>
+      </header>
+
+      <main className="w-full max-w-4xl">
+        <Tabs defaultValue="results" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="results">ফলাফল দেখুন</TabsTrigger>
+            <TabsTrigger value="notices">বিদ্যালয়ের নোটিশ</TabsTrigger>
+            <TabsTrigger value="ai-assistant">সহপাঠী AI</TabsTrigger>
+          </TabsList>
+          <TabsContent value="results">
+            <Card className="shadow-lg mt-4">
+              <CardHeader className="text-center bg-primary/10 rounded-t-lg">
+                <CardTitle className="text-2xl text-primary font-bold">
+                  ফলাফল অনুসন্ধান করুন
+                </CardTitle>
+                <CardDescription>
+                  আপনার শিক্ষার্থীর পরীক্ষার ফলাফল দেখতে নিচের তথ্যগুলো পূরণ
+                  করুন।
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                      <FormField
+                        control={form.control}
+                        name="academicYear"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>শিক্ষাবর্ষ</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="শিক্ষাবর্ষ" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="2025">২০২৫</SelectItem>
+                                <SelectItem value="2026">২০২৬</SelectItem>
+                                <SelectItem value="2027">২০২৭</SelectItem>
+                                <SelectItem value="2028">২০২৮</SelectItem>
+                                <SelectItem value="2029">২০২৯</SelectItem>
+                                <SelectItem value="2030">২০৩০</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="class"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>শ্রেণি</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              disabled
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="একটি শ্রেণী নির্বাচন করুন" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="1">প্রথম শ্রেণী</SelectItem>
+                                <SelectItem value="2">দ্বিতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="3">তৃতীয় শ্রেণী</SelectItem>
+                                <SelectItem value="4">চতুর্থ শ্রেণী</SelectItem>
+                                <SelectItem value="5">পঞ্চম শ্রেণী</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="examType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>পরীক্ষা</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="একটি পরীক্ষার ধরন নির্বাচন করুন" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="প্রথম প্রান্তিক">
+                                  প্রথম প্রান্তিক
+                                </SelectItem>
+                                <SelectItem value="দ্বিতীয় প্রান্তিক">
+                                  দ্বিতীয় প্রান্তিক
+                                </SelectItem>
+                                <SelectItem value="বার্ষিক">বার্ষিক</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="rollNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>রোল নম্বর</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="আপনার রোল নম্বর"
+                                {...field}
+                                disabled
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>ত্রুটি</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+                    <div className="flex justify-center pt-2">
+                      <Button
+                        type="submit"
+                        className="w-full max-w-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full shadow-lg"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            অনুসন্ধান করা হচ্ছে...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="mr-2 h-4 w-4" />
+                            ফলাফল দেখুন
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+            <ToppersList />
+          </TabsContent>
+          <TabsContent value="notices">
+            <NoticeBoard />
+          </TabsContent>
+          <TabsContent value="ai-assistant">
+            <ClassmateAi />
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      <MultilingualSupport />
+
+      <footer className="mt-16 text-center text-sm text-muted-foreground px-4">
+        <p>
+          &copy; {new Date().getFullYear()} হরিণখাইন সরকারি প্রাথমিক বিদ্যালয়।
+          সর্বস্বত্ব সংরক্ষিত।
+        </p>
+      </footer>
+    </div>
+    </>
+  );
+}
