@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -24,6 +24,30 @@ export function ClassmateAi() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversation, setConversation] = useState<Message[]>([]);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const savedConversation = localStorage.getItem('classmate-ai-conversation');
+      if (savedConversation) {
+        setConversation(JSON.parse(savedConversation));
+      }
+    } catch (error) {
+      console.error("Failed to parse conversation from localStorage", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (conversation.length) {
+      localStorage.setItem('classmate-ai-conversation', JSON.stringify(conversation));
+    }
+    if (scrollAreaRef.current) {
+        const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
+        if (viewport) {
+            viewport.scrollTop = viewport.scrollHeight;
+        }
+    }
+  }, [conversation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,8 +90,8 @@ export function ClassmateAi() {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-96 w-full p-6">
-          <div className="space-y-4">
+        <ScrollArea className="h-96 w-full" ref={scrollAreaRef}>
+           <div className="space-y-4 p-6">
             {conversation.map((msg, index) => (
               <div
                 key={index}
@@ -108,7 +132,7 @@ export function ClassmateAi() {
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSubmit(e);
+                handleSubmit(e as any);
               }
             }}
           />
