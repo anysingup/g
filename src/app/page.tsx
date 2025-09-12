@@ -29,14 +29,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MultilingualSupport } from "@/components/multilingual-support";
 import { Loader2, Search, Trophy } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { students } from "@/lib/results-data";
 import { NoticeBoard } from "@/components/notice-board";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClassmateAi } from "@/components/classmate-ai";
 
 
 const FormSchema = z.object({
@@ -207,10 +205,9 @@ export default function HomePage() {
 
       <main className="w-full max-w-4xl">
         <Tabs defaultValue="results" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="results">ফলাফল দেখুন</TabsTrigger>
             <TabsTrigger value="notices">বিদ্যালয়ের নোটিশ</TabsTrigger>
-            <TabsTrigger value="ai-assistant">সহপাঠী AI</TabsTrigger>
           </TabsList>
           <TabsContent value="results">
             <Card className="shadow-lg mt-4">
@@ -366,14 +363,8 @@ export default function HomePage() {
           <TabsContent value="notices">
             <NoticeBoard />
           </TabsContent>
-          <TabsContent value="ai-assistant">
-            <p className="text-center text-sm text-muted-foreground">this AI made by Omar Faruque ( Afif )</p>
-            <ClassmateAi />
-          </TabsContent>
         </Tabs>
       </main>
-
-      <MultilingualSupport />
 
       <footer className="mt-16 text-center text-sm text-muted-foreground px-4">
         <p>

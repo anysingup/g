@@ -25,11 +25,3 @@ export interface Notice {
   description: string;
   createdAt: number;
 }
-
-export interface AiMessage {
-  sender: 'user' | 'ai';
-  text: string;
-  timestamp: number;
-  image?: string; // For user uploads (preview URL)
-  generatedImage?: string; // For AI responses
-}
