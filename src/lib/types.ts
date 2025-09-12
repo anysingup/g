@@ -25,3 +25,16 @@ export interface Notice {
   description: string;
   createdAt: number;
 }
+
+export type AiConversation = {
+  id: string;
+  student: {
+    class: string;
+    roll: string;
+  };
+  query: string;
+  response: string;
+  imageUrl?: string;
+  generatedImage?: string;
+  timestamp: number;
+};
