@@ -28,7 +28,7 @@ const imageGenerationFlow = ai.defineFlow(
   },
   async (prompt) => {
     const { media } = await ai.generate({
-        model: googleAI('gemini-2.5-flash'),
+        model: googleAI('gemini-pro-vision'),
         prompt: `A beautiful, vibrant, and simple illustration for a child. Style: storybook, colorful, friendly. Prompt: ${prompt}`,
         config: {
             responseModalities: ['IMAGE'],
