@@ -1,56 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { BellRing, Loader2 } from "lucide-react";
-import type { Notice } from "@/lib/types";
-import { database } from "@/lib/firebase";
-import { ref, query, onValue, orderByChild, limitToLast } from "firebase/database";
-
+import { useEffect, useState } from 'react';
+import { onValue, query, ref, orderByChild, limitToLast } from 'firebase/database';
+import { database } from '@/lib/firebase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BellRing, Loader2 } from 'lucide-react';
+import type { Notice } from '@/lib/types';
 
 const toBengaliDateTime = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const bnMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-    const bnNumbers: { [key: string]: string } = { '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯' };
-    
-    const day = String(date.getDate()).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers]);
-    const month = bnMonths[date.getMonth()];
-    const year = String(date.getFullYear()).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers]);
+  const date = new Date(timestamp);
+  const bnMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+  const bnNumbers: { [key: string]: string } = { '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯' };
+  
+  const day = String(date.getDate()).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers]);
+  const month = bnMonths[date.getMonth()];
+  const year = String(date.getFullYear()).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers]);
 
-    return `${day} ${month}, ${year}`;
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+  const strTime = `${String(hours).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers])}:${String(minutes).replace(/\d/g, (d) => bnNumbers[d as keyof typeof bnNumbers])} ${ampm}`;
+
+  return `${day} ${month}, ${year} | ${strTime}`;
 };
 
 export const NoticeBoard = () => {
-    const [notices, setNotices] = useState<Notice[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const noticesRef = query(ref(database, 'notices'), orderByChild('createdAt'), limitToLast(50));
-        const unsubscribe = onValue(noticesRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const noticeList: Notice[] = Object.entries(data)
-                    .map(([id, value]) => ({ id, ...(value as Omit<Notice, 'id'>) }))
-                    .sort((a, b) => b.createdAt - a.createdAt); // Sort descending
-                setNotices(noticeList);
-            } else {
-                setNotices([]);
-            }
-            setLoading(false);
-        }, (error) => {
-            console.error("Error fetching notices:", error);
-            setLoading(false);
-        });
+  useEffect(() => {
+    const noticesRef = query(ref(database, 'notices'), orderByChild('createdAt'), limitToLast(50));
+    const unsubscribe = onValue(noticesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const noticeList: Notice[] = Object.keys(data)
+          .map(key => ({ id: key, ...data[key] }))
+          .sort((a, b) => b.createdAt - a.createdAt);
+        setNotices(noticeList);
+      }
+      setLoading(false);
+    }, (error) => {
+      console.error("Failed to fetch notices:", error);
+      setLoading(false);
+    });
 
-        return () => unsubscribe();
-    }, []);
-
+    return () => unsubscribe();
+  }, []);
 
   return (
     <Card className="shadow-lg mt-4">
@@ -63,30 +60,30 @@ export const NoticeBoard = () => {
           গুরুত্বপূর্ণ নোটিশ ও ঘোষণা দেখুন
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 min-h-[400px]">
+      <CardContent className="p-6 min-h-[200px]">
         {loading ? (
-             <div className="flex justify-center items-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-             </div>
+          <div className="flex justify-center items-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         ) : notices.length > 0 ? (
-            <div className="space-y-4">
+          <div className="space-y-4">
             {notices.map((notice) => (
-                <div
+              <div
                 key={notice.id}
-                className="p-4 bg-gray-50 rounded-lg border border-gray-200 relative group"
-                >
+                className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+              >
                 <h3 className="font-semibold text-lg text-gray-800">
-                    {notice.title}
+                  {notice.title}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                    প্রকাশের তারিখ: {toBengaliDateTime(notice.createdAt)}
+                  প্রকাশের তারিখ: {toBengaliDateTime(notice.createdAt)}
                 </p>
                 <p className="text-gray-700 whitespace-pre-wrap">{notice.description}</p>
-                </div>
+              </div>
             ))}
-            </div>
+          </div>
         ) : (
-            <p className="text-center text-muted-foreground mt-8">এখনো কোনো নোটিশ প্রকাশ করা হয়নি।</p>
+          <p className="text-center text-muted-foreground mt-8">এখনো কোনো নোটিশ প্রকাশ করা হয়নি।</p>
         )}
       </CardContent>
     </Card>

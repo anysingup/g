@@ -1,6 +1,7 @@
-// Import the functions you need from the SDKs you need
+'''// Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
+import type { Notice } from "@/lib/types";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,6 +17,31 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const db = getFirestore(app);
 
-export { app, database };
+const noticesCollection = collection(db, 'notices');
+
+// --- Firestore Helper Functions for Notices ---
+
+export async function getNotices(): Promise<Notice[]> {
+    const q = query(noticesCollection, orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notice));
+}
+
+export async function addNotice(notice: { title: string; description: string }): Promise<Notice> {
+    const newNotice = {
+        ...notice,
+        createdAt: Date.now(),
+    };
+    const docRef = await addDoc(noticesCollection, newNotice);
+    return { id: docRef.id, ...newNotice };
+}
+
+export async function deleteNotice(id: string): Promise<void> {
+    const noticeDoc = doc(db, 'notices', id);
+    await deleteDoc(noticeDoc);
+}
+
+export { app, db };
+'''
