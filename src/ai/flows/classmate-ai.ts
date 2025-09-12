@@ -11,6 +11,8 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { generateImage } from './image-generation-flow';
+import { googleAI } from '@genkit-ai/googleai';
+
 
 const ClassmateAiInputSchema = z.object({
   query: z.string().describe('The student’s question or problem.'),
@@ -41,26 +43,13 @@ export async function getClassmateResponse(
   return classmateAiFlow(input);
 }
 
-const imageRequestDetectorPrompt = ai.definePrompt({
-  name: 'imageRequestDetector',
-  input: { schema: z.object({ query: z.string() }) },
-  output: { schema: z.object({ isImageRequest: z.boolean(), imagePrompt: z.string().optional() }) },
-  prompt: `You are an expert in detecting user intent. Analyze the following user query. Determine if the user is asking to draw, create, or generate an image.
-
-  User query: "{{query}}"
-
-  If the user is asking for an image, set "isImageRequest" to true and provide a simple, clean English prompt for an image generation model in the "imagePrompt" field.
-  If the user is not asking for an image, set "isImageRequest" to false.`,
-  config: {
-    model: 'googleai/gemini-2.5-flash',
-  }
-});
-
-
 const classmateAiPrompt = ai.definePrompt({
   name: 'classmateAiPrompt',
   input: {schema: ClassmateAiInputSchema},
-  output: {schema: ClassmateAiOutputSchema},
+  output: {schema: z.object({
+    response: z.string(),
+    imagePrompt: z.string().optional(),
+  })},
   prompt: `You are "Sahapathi AI" (Classmate AI), a multi-talented and friendly AI assistant for primary school students in Bangladesh. Your personality is like a knowledgeable, patient, and creative older sibling.
 
 Your capabilities are:
@@ -68,10 +57,12 @@ Your capabilities are:
 2.  **Tutor English:** If the user wants to learn English, act as a patient tutor. Use a mix of simple Bengali and English.
 3.  **Creative Writing:** Write age-appropriate stories, poems, or songs in Bengali on request. The tone should be simple, engaging, and positive.
 4.  **Identify from Photo:** If a user uploads a photo and asks who the person is, or what is in the image, analyze the photo and provide a simple, descriptive answer.
+5.  **Generate Images:** If the user asks you to draw, create, or generate an image, you MUST set the "imagePrompt" field to a simple, clean English prompt for an image generation model.
 
 **Instructions:**
 - Analyze the user's query, conversation history, and any provided photo.
-- Provide a helpful response in simple Bengali.
+- If the query is a request to draw, create, or generate an image, set the "imagePrompt" field with a suitable English prompt. Provide a short confirmation message in Bengali in the "response" field (e.g., "তোমার জন্য একটি ছবি তৈরি করছি!").
+- For all other queries, provide a helpful response in simple Bengali in the "response" field and leave "imagePrompt" empty.
 - Always be encouraging, maintain a friendly and positive tone, like a true classmate.
 
 {{#if photoDataUri}}
@@ -87,7 +78,7 @@ Conversation History:
 Student's Query:
 "{{query}}"
 
-Your helpful and creative response:
+Your analysis and response:
 `,
 });
 
@@ -99,15 +90,14 @@ const classmateAiFlow = ai.defineFlow(
     outputSchema: ClassmateAiOutputSchema,
   },
   async (input) => {
+    const { output } = await classmateAiPrompt(input);
 
-    const imageDetectionResult = await imageRequestDetectorPrompt({ query: input.query });
-
-    if (imageDetectionResult.output?.isImageRequest && imageDetectionResult.output.imagePrompt) {
+    if (output?.imagePrompt) {
         try {
-            const imageResult = await generateImage(imageDetectionResult.output.imagePrompt);
+            const imageResult = await generateImage(output.imagePrompt);
             if (imageResult && imageResult.imageDataUri) {
                 return {
-                    response: 'তোমার জন্য একটি ছবি তৈরি করেছি!',
+                    response: output.response || 'তোমার জন্য একটি ছবি তৈরি করেছি!',
                     generatedImage: imageResult.imageDataUri,
                 };
             }
@@ -120,8 +110,6 @@ const classmateAiFlow = ai.defineFlow(
         }
     }
     
-    // If it's not an image generation request, proceed with the normal response.
-    const { output } = await classmateAiPrompt(input);
-    return output!;
+    return { response: output!.response };
   }
 );
