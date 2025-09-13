@@ -34,7 +34,7 @@ function toBengaliNumber(enNumber: number | string) {
     return en.replace(/[0-9]/g, (n) => bnMap[n]);
 }
 
-const ResultCardComponent: React.FC<ResultCardProps> = ({ student, result }) => {
+const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({ student, result }, ref) => {
   let totalGpa = 0;
   let totalObtainedMarks = 0;
   let totalMaxMarks = 0;
@@ -158,7 +158,7 @@ const ResultCardComponent: React.FC<ResultCardProps> = ({ student, result }) => 
   }
 
   return (
-    <div className="print-container bg-white p-4 sm:p-8">
+    <div ref={ref} className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
         <CardHeader className="text-center p-4 print:p-2 border-b-2 border-gray-200 relative">
             <div className="flex justify-center items-center mb-4">
@@ -322,7 +322,7 @@ const ResultCardComponent: React.FC<ResultCardProps> = ({ student, result }) => 
       </Card>
     </div>
   );
-};
+});
 ResultCardComponent.displayName = 'ResultCardComponent';
 
 
@@ -345,9 +345,7 @@ export function ResultCard({ student, result }: ResultCardProps) {
         </Button>
       </div>
       
-      <div ref={componentRef}>
-        <ResultCardComponent student={student} result={result} />
-      </div>
+      <ResultCardComponent ref={componentRef} student={student} result={result} />
     </>
   );
 }
