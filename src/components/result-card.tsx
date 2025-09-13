@@ -17,7 +17,7 @@ import {
 import { getGradeInfo } from "@/lib/utils";
 import type { Student, ExamResult } from "@/lib/types";
 import { Printer } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface ResultCardProps {
   student: Student;
@@ -34,7 +34,7 @@ function toBengaliNumber(enNumber: number | string) {
     return en.replace(/[0-9]/g, (n) => bnMap[n]);
 }
 
-const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({ student, result }, ref) => {
+const ResultCardComponent: React.FC<ResultCardProps> = ({ student, result }) => {
   let totalGpa = 0;
   let totalObtainedMarks = 0;
   let totalMaxMarks = 0;
@@ -158,7 +158,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
   }
 
   return (
-    <div ref={ref} className="print-container bg-white p-4 sm:p-8">
+    <div className="print-container bg-white p-4 sm:p-8">
       <Card className="w-full max-w-4xl mx-auto animate-fade-in shadow-lg print:shadow-none print:border-0">
         <CardHeader className="text-center p-4 print:p-2 border-b-2 border-gray-200 relative">
             <div className="flex justify-center items-center mb-4">
@@ -322,7 +322,7 @@ const ResultCardComponent = React.forwardRef<HTMLDivElement, ResultCardProps>(({
       </Card>
     </div>
   );
-});
+};
 ResultCardComponent.displayName = 'ResultCardComponent';
 
 
@@ -337,16 +337,17 @@ export function ResultCard({ student, result }: ResultCardProps) {
   return (
     <>
       <div className="print-hidden w-full max-w-4xl mx-auto text-center my-4">
-        <button
+        <Button
           onClick={handlePrint}
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
         >
           <Printer className="mr-2 h-4 w-4" />
           প্রিন্ট করুন
-        </button>
+        </Button>
       </div>
       
-      <ResultCardComponent ref={componentRef} student={student} result={result} />
+      <div ref={componentRef}>
+        <ResultCardComponent student={student} result={result} />
+      </div>
     </>
   );
 }
